@@ -113,7 +113,7 @@ namespace CapriDesktop
         private static readonly string[,] English = { { "chooms", "chewms" }, { "choom", "chewm" }, { "preem", "preme" }, { "yezzirrr", "yessirrr" } };
         private static readonly string[,] French = { { "chooms", "tchoums" }, { "choom", "tchoum" }, { "preem", "pr\u00eeme" }, { "yezzirrr", "yessirrr" } };
 
-        private static bool InFrench { get { return Brain.LanguageCode(Brain.Language) == "fr"; } }
+        private static bool InFrench { get { return Brain.French; } }
 
         private static string[,] Respelled { get { return InFrench ? French : English; } }
 

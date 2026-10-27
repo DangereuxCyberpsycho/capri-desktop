@@ -227,7 +227,7 @@ namespace CapriDesktop
         }
 
         // Her asking what to remember, so their next message is the note.
-        internal static bool AskedWhat(string said) { return Regex.IsMatch(said ?? "", @"\bwhat\b[^.!?]*\b(remember|note|memory|save|keep)\b[^.!?]*\?\s*$", RegexOptions.IgnoreCase); }
+        internal static bool AskedWhat(string said) { return Regex.IsMatch(said ?? "", @"\bwhat\b[^.!?]*\b(remember|note|memory|save|keep)\b[^.!?]*\?\s*$|\b(retiens|retenir|note|noter|garde|garder)\b[^.!?]*\bquoi\b[^.!?]*\?\s*$|\bquoi\b[^.!?]*\b(retenir|noter|garder)\b[^.!?]*\?\s*$", RegexOptions.IgnoreCase); }
 
         // "Remember that" or "make a note of it" points back at what they just said.
         internal static bool Back(string said) { return Regex.IsMatch(Asked(said), @"\b(that|this|it)$", RegexOptions.IgnoreCase); }
@@ -274,9 +274,9 @@ namespace CapriDesktop
             return text.Append("\nChoose one value from each | choice and omit unused fields.\nTo use one, reply with only the call, like: open_app{\"name\": \"Spotify\"}").ToString();
         }
 
-        internal const string SayPlease = "Say please.";
-        private static readonly Regex Polite = new Regex(@"\b(please|pls|plz|pleas|thank you|thanks)\b", RegexOptions.IgnoreCase);
-        private static readonly Regex JustPlease = new Regex(@"^\W*((ok|okay|fine|sorry)\W+)?(pretty\s+)?(please+|pls|plz|pleas+e*)(\s+capri)?\W*$", RegexOptions.IgnoreCase);
+        internal static string SayPlease { get { return Brain.Say("Say please.", "Dis s'il te pla\u00eet."); } }
+        private static readonly Regex Polite = new Regex(@"\b(please|pls|plz|pleas|thank you|thanks|s['’]il (te|vous) pla[iî]t|stp|svp|merci)\b", RegexOptions.IgnoreCase);
+        private static readonly Regex JustPlease = new Regex(@"^\W*((ok|okay|fine|sorry)\W+)?(pretty\s+)?(please+|pls|plz|pleas+e*|s['’]il (te|vous) pla[iî]t|stp|svp)(\s+capri)?\W*$", RegexOptions.IgnoreCase);
         private static readonly Random Dice = new Random();
         internal static Func<int> PleaseRoll = delegate { lock (Dice) return Dice.Next(10); };
         private static string heldForPlease;
@@ -336,14 +336,14 @@ namespace CapriDesktop
 
         internal static string Pulled(string result)
         {
-            if ((result ?? "").StartsWith("Opened your own website", StringComparison.Ordinal)) return "Voilà mon site, choom. C'est là qu'on me télécharge.";
+            if ((result ?? "").StartsWith("Opened your own website", StringComparison.Ordinal)) return Brain.Say("Here's my site, choom. That's where people download me.", "Voil\u00e0 mon site, choom. C'est l\u00e0 qu'on me t\u00e9l\u00e9charge.");
             // Power lines go out as they are: no second brain call while the shutdown counts down.
             if (Regex.IsMatch(result ?? "", @"^(Shutting your PC down|Restarting your PC|Signing you out|Putting your PC to sleep|Lock(ed|ing) your PC|Cancelled it\.)")) return result;
             Match searched = Regex.Match(result ?? "", @"^Searched google\.com for (.+)\.$");
-            return searched.Success ? "J'ai cherché \"" + searched.Groups[1].Value + "\" sur Google pour toi, choom." : null;
+            return searched.Success ? Brain.Say("Pulled up \"" + searched.Groups[1].Value + "\" on Google for you, choom.", "J'ai cherch\u00e9 \"" + searched.Groups[1].Value + "\" sur Google pour toi, choom.") : null;
         }
 
-        internal const string Unpromised = "Je ne l'ai pas encore fait, choom. Dis-moi quoi ouvrir ou sur quoi cliquer et je m'en occupe.";
+        internal static string Unpromised { get { return Brain.Say("I haven't done that yet, choom. Tell me what to open or click and I'm on it.", "Je ne l'ai pas encore fait, choom. Dis-moi quoi ouvrir ou sur quoi cliquer et je m'en occupe."); } }
         private static readonly Regex Promise = new Regex(@"\b(i'?ll|i will|let me|lemme|i'?m (gonna|going to|about to)|gonna|on it,?)\s+(\w+\s+){0,2}(open|launch|load|boot|fire|pull|bring|search|google|look up|click|type|close|switch|head|install|download|play(?!\s+(along|around|with|nice|fair|dumb|it (cool|safe)|((a|some|the|this|that|any|your|my)\s+)?(games?|round|match)\b|devil))|put on|queue|blast|spin|mute|unmute|deafen|undeafen)\b|^((sure|ok|okay|alright|bet|got it|on it|say less|yessir+|yezzir+)[,.!\s]+)?(opening|launching|loading|pulling up|bringing up|firing up|booting up|heading to|searching|clicking|typing|closing|switching|playing|putting on|queuing|queueing|blasting|spinning|muting|unmuting|deafening|sending|messaging|texting|dming|replying|posting|hanging up|ending (the|your) call|leaving (the|your) (call|vc)|joining (the|your) (call|vc)|disconnecting)\b|\b(je vais|j'vais|laisse-moi|je m'en occupe,?)\s+(\w+\s+){0,2}(l'|t'|les |la |le )?(ouvrir|lancer|charger|chercher|googler|cliquer|taper|fermer|mettre|passer|t[ée]l[ée]charger|installer|jouer(?!\s+(avec|[àa]|aux|un|une|le jeu|au)\b))\b|^((ok|okay|d'accord|[çc]a marche|carr[ée]ment|yessir+|yezzir+)[,.!\s]+)?(j'ouvre|je lance|je mets|je cherche|je ferme|je clique|je tape|je passe|c'est parti pour)\b", RegexOptions.IgnoreCase);
 
         private static readonly Regex Calling = new Regex(@"^\W*(h[ée]+|hey|eh|et|ok|okay|salut|yo)\W+capr[iy]s?\b[\s,.!?:;\-]*(.*?)[\s.!?]*$", RegexOptions.IgnoreCase);

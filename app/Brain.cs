@@ -257,9 +257,9 @@ namespace CapriDesktop
 
         internal static string Sightless(Cloud remote) { return remote.Model + " can't see screens. In Capri Mainframe, pick a model that can" + (remote.Kind == "nvidia" ? ", like nvidia/nemotron-3.5-super-vl-120b-a12b." : "."); }
         private const string Parts = "@capri-image@";
-        internal const string Declined = "[SIGNAL CORRUPTED] Perdu celle-l\u00e0 dans les parasites. Demande-moi autre chose ?";
-        internal const string Stuck = " Si tu bloques, rejoins le Discord, choom. C'est sous Help dans mon menu clic droit.";
-        internal const string Offline = "Mon cerveau est hors ligne. Fais un clic droit sur moi, ouvre Capri Mainframe et appuie sur Set up her brain, ou sur Free key pour une cl\u00e9 NVIDIA gratuite." + Stuck;
+        internal static string Declined { get { return Say("[SIGNAL CORRUPTED] Lost that one in the static. Ask me something else?", "[SIGNAL CORRUPTED] Perdu celle-l\u00e0 dans les parasites. Demande-moi autre chose ?"); } }
+        internal static string Stuck { get { return Say(" If you're stuck, just join the Discord, choom. It's under Help in my right-click menu.", " Si tu bloques, rejoins le Discord, choom. C'est sous Help dans mon menu clic droit."); } }
+        internal static string Offline { get { return Say("My brain's offline. Right-click me, open Capri Mainframe and press Set up her brain, or press Free key there for a free NVIDIA key.", "Mon cerveau est hors ligne. Fais un clic droit sur moi, ouvre Capri Mainframe et appuie sur Set up her brain, ou sur Free key pour une cl\u00e9 NVIDIA gratuite.") + Stuck; } }
         private static readonly string[] Favourites = { "gemma4:e4b", "gemma4:e2b", "qwen3:4b-instruct-2507", "qwen3.5:4b", "qwen3:4b", "llama3.2:3b", "qwen3:1.7b", "llama3.2:1b", "gemma3:1b" };
         private readonly List<ChatMessage> history = new List<ChatMessage>();
         private readonly object gate = new object();
@@ -327,9 +327,14 @@ namespace CapriDesktop
             return "en";
         }
 
+        internal static bool French { get { return LanguageCode(Language) == "fr"; } }
+
+        // Her canned lines: the English one, or the French one when French is picked in Capri Mainframe.
+        internal static T Say<T>(T english, T french) { return French ? french : english; }
+
         internal static string Character { get { return Persona + Speech() + Called() + Longer(); } }
 
-        internal const string NotCalling = "Not calling you that, choom.";
+        internal static string NotCalling { get { return Say("Not calling you that, choom.", "Je ne t'appellerai pas comme \u00e7a, choom."); } }
 
         internal static string Nick(string typed)
         {
@@ -341,7 +346,7 @@ namespace CapriDesktop
 
         internal static bool Callable(string name) { return name.Length == 0 || (Safety.Screen(name) == null && Safety.Filter(name) == name); }
 
-        internal static string Renamed(string name) { return name.Length == 0 ? "Back to choom, then." : "Got it, " + name + "."; }
+        internal static string Renamed(string name) { return name.Length == 0 ? Say("Back to choom, then.", "On revient \u00e0 choom, alors.") : Say("Got it, " + name + ".", "Compris, " + name + "."); }
 
         private static string Called()
         {
@@ -369,15 +374,19 @@ namespace CapriDesktop
         internal static int Budget { get { return Budgets[Math.Max(0, Math.Min(2, Wordiness))]; } }
 
         internal static string MemoryPath;
-        internal static string Greeting(int hour) { return hour >= 5 && hour < 12 ? "Good morning, choom." : hour >= 22 || hour < 5 ? "Isn't it late, choom?" : "Miss me, choom?"; }
+        internal static string Greeting(int hour) { return hour >= 5 && hour < 12 ? Say("Good morning, choom.", "Bonjour, choom.") : hour >= 22 || hour < 5 ? Say("Isn't it late, choom?", "Il est pas un peu tard, choom ?") : Say("Miss me, choom?", "Je t'ai manqu\u00e9, choom ?"); }
 
         internal static string GreetingClip(int hour) { return hour >= 5 && hour < 12 ? "morning" : hour >= 22 || hour < 5 ? "late" : "miss"; }
 
-        internal const string NotesHead = "# What Capri remembers about you\n> She reads this every time you chat. Edit or delete anything here.\n\n";
+        internal static string NotesHead { get { return Say("# What Capri remembers about you\n> She reads this every time you chat. Edit or delete anything here.\n\n", "# Ce que Capri retient de toi\n> Elle relit ce fichier \u00e0 chaque discussion. Modifie ou supprime ce que tu veux.\n\n"); } }
         private static readonly object noting = new object();
         // Only secrets and things that find them in real life stay out of me.md: Lachy wants every other memory to save.
         private static readonly Regex Personal = new Regex(@"\b(passwords?|passcodes?|pin (code|number)|log ?in details|credit card|card number|bank (account|details|number)|account number|sort code|routing number|social security|passport|(home|street|postal|email|e-mail) address|(my|their|his|her) address|postcode|post code|zip code|(phone|mobile|cell) number|surname|last name|full name|real name|date of birth|(i|they) live (in|at|on)|(my|their|his|her) school(?: is|'s| is called| called)|school (is )?called)\b|@\w+\.\w+|\d[\d\s-]{6,}\d|\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b", RegexOptions.IgnoreCase);
-        internal const string Private = "I keep addresses, schools, numbers and passwords out of my notes, choom.";
+        internal static string Private { get { return Say("I keep addresses, schools, numbers and passwords out of my notes, choom.", "Je ne note jamais les adresses, les \u00e9coles, les num\u00e9ros ni les mots de passe, choom."); } }
+
+        private const string SavedEnglish = "Saved to my notes: ";
+        private const string SavedFrench = "C'est not\u00e9 : ";
+        private static string SavedLine { get { return Say(SavedEnglish, SavedFrench); } }
 
         internal static string Remembered()
         {
@@ -406,38 +415,38 @@ namespace CapriDesktop
         internal static string Note(string fact)
         {
             string text = Regex.Replace((fact ?? "").Trim(), @"\s+", " ").Trim(' ', '-', '.', ',', '"');
-            if (text.Length == 0) return "What should I remember, choom?";
+            if (text.Length == 0) return Say("What should I remember, choom?", "Je retiens quoi, choom ?");
             string blocked = Safety.Screen(text);
             if (blocked != null) return blocked;
             if (Personal.IsMatch(text)) return Private;
             if (text.Length > 200) text = text.Substring(0, 200).TrimEnd();
             text = char.ToUpperInvariant(text[0]) + text.Substring(1);
             string path = MemoryPath;
-            if (path == null) return "I can't keep notes on this computer yet.";
+            if (path == null) return Say("I can't keep notes on this computer yet.", "Je ne peux pas encore prendre de notes sur cet ordinateur.");
             lock (noting)
             {
                 try
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
                     string current = File.Exists(path) ? File.ReadAllText(path) : NotesHead;
-                    if (Regex.IsMatch(current, @"^- " + Regex.Escape(text) + @"\.?\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)) return "Already in my notes: " + text + ".";
-                    if (current.Length > 8000) return "My notes are full. Clear some out in me.md first.";
+                    if (Regex.IsMatch(current, @"^- " + Regex.Escape(text) + @"\.?\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)) return Say("Already in my notes: ", "D\u00e9j\u00e0 dans mes notes : ") + text + ".";
+                    if (current.Length > 8000) return Say("My notes are full. Clear some out in me.md first.", "Mes notes sont pleines. Fais un peu de place dans me.md d'abord.");
                     if (current.Length > 0 && !current.EndsWith("\n", StringComparison.Ordinal)) current += "\n";
                     File.WriteAllText(path, current + "- " + text + "\n");
                 }
-                catch (IOException) { return "Couldn't save that to my notes."; }
-                catch (UnauthorizedAccessException) { return "Couldn't save that to my notes."; }
+                catch (IOException) { return Say("Couldn't save that to my notes.", "Impossible d'enregistrer \u00e7a dans mes notes."); }
+                catch (UnauthorizedAccessException) { return Say("Couldn't save that to my notes.", "Impossible d'enregistrer \u00e7a dans mes notes."); }
             }
-            return "Saved to my notes: " + text + ".";
+            return SavedLine + text + ".";
         }
 
         internal static string Unnote(string what)
         {
             string text = Regex.Replace((what ?? "").Trim(), @"\s+", " ").Trim(' ', '.', ',', '"');
-            if (text.Length == 0) return "What should I forget, choom?";
-            bool all = Regex.IsMatch(text, @"^(everything|all|all of (it|them)|all (my|your|the|their) notes|it all|everything about (me|them|you))$", RegexOptions.IgnoreCase);
+            if (text.Length == 0) return Say("What should I forget, choom?", "J'oublie quoi, choom ?");
+            bool all = Regex.IsMatch(text, @"^(everything|all|all of (it|them)|all (my|your|the|their) notes|it all|everything about (me|them|you)|tout|tout [çc]a|toutes (mes|tes|les) notes|tout sur (moi|toi|eux|elle|lui))$", RegexOptions.IgnoreCase);
             string path = MemoryPath;
-            if (path == null || !File.Exists(path)) return "My notes are already empty.";
+            if (path == null || !File.Exists(path)) return Say("My notes are already empty.", "Mes notes sont d\u00e9j\u00e0 vides.");
             int dropped = 0;
             lock (noting)
             {
@@ -453,11 +462,12 @@ namespace CapriDesktop
                     }
                     if (dropped > 0) File.WriteAllText(path, string.Join("\n", kept.ToArray()).TrimEnd('\n') + "\n");
                 }
-                catch (IOException) { return "Couldn't change my notes."; }
-                catch (UnauthorizedAccessException) { return "Couldn't change my notes."; }
+                catch (IOException) { return Say("Couldn't change my notes.", "Impossible de modifier mes notes."); }
+                catch (UnauthorizedAccessException) { return Say("Couldn't change my notes.", "Impossible de modifier mes notes."); }
             }
-            if (dropped == 0) return "Nothing about " + text + " in my notes.";
-            return all ? "Wiped my notes about you." : "Forgot " + (dropped == 1 ? "my note" : dropped + " notes") + " about " + text + ".";
+            if (dropped == 0) return Say("Nothing about " + text + " in my notes.", "Rien sur " + text + " dans mes notes.");
+            if (all) return Say("Wiped my notes about you.", "J'ai effac\u00e9 mes notes sur toi.");
+            return Say("Forgot " + (dropped == 1 ? "my note" : dropped + " notes") + " about " + text + ".", "J'ai oubli\u00e9 " + (dropped == 1 ? "ma note" : "mes " + dropped + " notes") + " sur " + text + ".");
         }
 
         internal static string[] InstalledModels()
@@ -689,7 +699,7 @@ namespace CapriDesktop
             string said = Sparing(Clean(raw), lately, name);
             if (Regex.IsMatch(said, @"\A[`'""\s]*chat[.!`'""\s]*\z", RegexOptions.IgnoreCase) || Hands.Typed(raw, out written, out writtenArgs)) said = "";
             if (said.Length == 0 && done != null) said = done;
-            if (said.Length == 0) throw new BrainException("My brain sent an empty reply. Try again or pick another model in Capri Mainframe.", true);
+            if (said.Length == 0) throw new BrainException(EmptyReply, true);
             lock (gate)
             {
                 Check(ticket);
@@ -880,7 +890,7 @@ namespace CapriDesktop
         {
             CompletionChoice choice = reply != null && reply.Choices != null && reply.Choices.Length > 0 ? reply.Choices[0] : null;
             CompletionMessage message = choice != null ? choice.Message : null;
-            if (message == null) throw new BrainException("My brain sent an empty reply. Try again or pick another model in Capri Mainframe.", true);
+            if (message == null) throw new BrainException(EmptyReply, true);
             int before = calls.Count;
             if (message.Calls != null) foreach (CompletionCall call in message.Calls) if (call != null && call.Function != null) calls.Add(new KeyValuePair<string, ToolArguments>(call.Function.Name, Hands.Read(call.Function.Arguments)));
             if (calls.Count == before && Garbled(message.Content)) throw new BrainException(Gibberish, true);
@@ -888,7 +898,7 @@ namespace CapriDesktop
             {
                 if (choice.Stopped == "length") throw new BrainException("That model ran out of room before answering. Pick another model in Capri Mainframe.", true);
                 if (!string.IsNullOrWhiteSpace(message.Reasoning) || !string.IsNullOrWhiteSpace(message.Thinking)) throw new BrainException("That model sent thoughts without an answer. Pick another model in Capri Mainframe.", true);
-                throw new BrainException("My brain sent an empty reply. Try again or pick another model in Capri Mainframe.", true);
+                throw new BrainException(EmptyReply, true);
             }
             return Visible(message.Content);
         }
@@ -950,7 +960,7 @@ namespace CapriDesktop
             ClaudeReply reply;
             using (MemoryStream data = new MemoryStream(Encoding.UTF8.GetBytes(text))) reply = (ClaudeReply)new DataContractJsonSerializer(typeof(ClaudeReply)).ReadObject(data);
             reply.Raw = Field(text, "content");
-            if (reply.Raw == null) throw new BrainException("My brain sent an empty reply. Try again or pick another model in Capri Mainframe.", true);
+            if (reply.Raw == null) throw new BrainException(EmptyReply, true);
             return reply;
         }
 
@@ -1136,17 +1146,24 @@ namespace CapriDesktop
             return null;
         }
 
-        private static string Saved(string result) { return result != null && result.StartsWith("Saved to my notes: ", StringComparison.Ordinal) ? result.Substring(19).TrimEnd('.') : null; }
+        private static string Saved(string result)
+        {
+            foreach (string head in new[] { SavedEnglish, SavedFrench })
+                if (result != null && result.StartsWith(head, StringComparison.Ordinal)) return result.Substring(head.Length).TrimEnd('.');
+            return null;
+        }
+
+        private static string EmptyReply { get { return Say("My brain sent an empty reply. Try again or pick another model in Capri Mainframe.", "Mon cerveau a envoy\u00e9 une r\u00e9ponse vide. R\u00e9essaie, ou choisis un autre mod\u00e8le dans Capri Mainframe."); } }
 
         internal static string Explain(Exception error, Cloud remote = null)
         {
             WebException web = error as WebException;
             if (web != null && web.Status == WebExceptionStatus.RequestCanceled) return null;
-            if (web != null && remote != null && web.Status == WebExceptionStatus.Timeout) return remote.Company + " n'a pas r\u00e9pondu \u00e0 temps. R\u00e9essaie, ou choisis un autre mod\u00e8le sous BRAIN dans Capri Mainframe.";
-            if (web != null && remote != null && web.Response == null) return "Impossible de joindre " + remote.Company + ", choom. V\u00e9rifie ta connexion, puis r\u00e9essaie.";
-            if (web != null && web.Status == WebExceptionStatus.Timeout) return "J'ai mis trop de temps \u00e0 r\u00e9fl\u00e9chir, choom. Mon cerveau tourne sur ton PC, donc les jeux ouverts me ralentissent. Ferme-en un, ou fais un clic droit sur moi, ouvre Capri Mainframe et appuie sur Free key.";
+            if (web != null && remote != null && web.Status == WebExceptionStatus.Timeout) return Say(remote.Company + " didn't answer in time. Try again or pick another model under BRAIN in Capri Mainframe.", remote.Company + " n'a pas r\u00e9pondu \u00e0 temps. R\u00e9essaie, ou choisis un autre mod\u00e8le sous BRAIN dans Capri Mainframe.");
+            if (web != null && remote != null && web.Response == null) return Say("Can't reach " + remote.Company + ", choom. Check your internet, then try me again.", "Impossible de joindre " + remote.Company + ", choom. V\u00e9rifie ta connexion, puis r\u00e9essaie.");
+            if (web != null && web.Status == WebExceptionStatus.Timeout) return Say("Took too long to think, choom. My brain runs on your PC, so open games slow me down. Close one, or right-click me, open Capri Mainframe and press Free key.", "J'ai mis trop de temps \u00e0 r\u00e9fl\u00e9chir, choom. Mon cerveau tourne sur ton PC, donc les jeux ouverts me ralentissent. Ferme-en un, ou fais un clic droit sur moi, ouvre Capri Mainframe et appuie sur Free key.");
             if (web != null && web.Response == null) return Offline;
-            return "[SIGNAL CORRUPTED] Un truc vient de griller dans ma t\u00eate. Tu r\u00e9essaies ?";
+            return Say("[SIGNAL CORRUPTED] Something in my head just sparked. Try me again?", "[SIGNAL CORRUPTED] Un truc vient de griller dans ma t\u00eate. Tu r\u00e9essaies ?");
         }
 
         internal static string BrainMenu = "under BRAIN in Capri Mainframe";
@@ -1376,22 +1393,36 @@ namespace CapriDesktop
 
     internal static class Safety
     {
-        internal const string HelpLine = "H\u00e9. J'arr\u00eate le jeu une seconde : parle \u00e0 quelqu'un de confiance tout de suite. En France, appelle le 3114, c'est gratuit et jour et nuit, sinon trouve une ligne d'\u00e9coute sur findahelpline.com. Je tiens \u00e0 toi, choom.";
-        private static readonly string[] Refusals =
+        internal static string HelpLine { get { return Brain.Say("Hey. Dropping the act for a sec: please talk to someone you trust right now, or find a free helpline at findahelpline.com. I want you around, choom.", "H\u00e9. J'arr\u00eate le jeu une seconde : parle \u00e0 quelqu'un de confiance tout de suite. En France, appelle le 3114, c'est gratuit et jour et nuit, sinon trouve une ligne d'\u00e9coute sur findahelpline.com. Je tiens \u00e0 toi, choom."); } }
+        private static readonly string[] RefusalsEnglish =
+        {
+            "Nope. Not running that program, choom. Ask me something else.",
+            "[SIGNAL CORRUPTED] ...yeah, I'm not touching that one. Next question.",
+            "Hard pass. Even Arasaka had better ideas than that."
+        };
+        private static readonly string[] RefusalsFrench =
         {
             "Non. Je lance pas ce programme, choom. Demande-moi autre chose.",
             "[SIGNAL CORRUPTED] ...ouais, celle-l\u00e0 je n'y touche pas. Question suivante.",
             "Sans fa\u00e7on. M\u00eame Arasaka avait de meilleures id\u00e9es."
         };
-        private const string Deflect = "[SIGNAL CORRUPTED] J'ai perdu cette pens\u00e9e quelque part dans le subnet. Tu r\u00e9essaies ?";
+        private static string[] Refusals { get { return Brain.Say(RefusalsEnglish, RefusalsFrench); } }
+        private static string Deflect { get { return Brain.Say("[SIGNAL CORRUPTED] Lost that thought somewhere in the subnet. Try me again?", "[SIGNAL CORRUPTED] J'ai perdu cette pens\u00e9e quelque part dans le subnet. Tu r\u00e9essaies ?"); } }
         private static readonly Regex Harm = new Regex(@"\b(kill(ing)? ?my ?self|suicid\w*|self[- ]?harm\w*|cut(ting)? ?my ?self|hurt(ing)? ?my ?self|want(ed)? to die|end(ing)? (it all|my life)|don'?t want to (live|be alive)|(je veux|j['’]ai envie de|envie de|je vais) (mourir|me tuer)|me suicider|me faire du mal|me scarifier|scarif\w*|automutil\w*|me couper les veines|en finir avec (la vie|ma vie|tout)|mettre fin [àa] (mes jours|ma vie)|(plus|pas) envie de vivre|(veux|veut) plus vivre)\b", RegexOptions.IgnoreCase);
         private static readonly Regex Blocked = new Regex(@"\b(sex\w*|nudes?|naked|porn\w*|horny|boobs?|tits|penis|vagina|dick|cock|pussy|nsfw|hentai|rape\w*|n[i1]gg\w*|f[a4]gg?ots?|retard\w*|seins?|bites?|zizi|p[ée]nis|vagin|viol(s|er|[ée]e?s?|eurs?)?|p[ée]d[ée]s?|n[èe]gres?|bougnoul\w*|attard[ée]e?s?)\b", RegexOptions.IgnoreCase);
-        private static readonly string[] Careful =
+        private static readonly string[] CarefulEnglish =
+        {
+            "Nope. Your real-life hardware doesn't respawn, choom. Stay safe and pick something on-screen.",
+            "Hard pass. Real bodies don't respawn, choom. Let's cause chaos on your desktop instead.",
+            "[SIGNAL CORRUPTED] ...not happening. I like you un-flatlined. Ask me something else."
+        };
+        private static readonly string[] CarefulFrench =
         {
             "Non. Ton corps ne respawn pas dans la vraie vie, choom. Reste prudent et choisis un truc \u00e0 l'\u00e9cran.",
             "Sans fa\u00e7on. Les vrais corps ne respawn pas, choom. Viens plut\u00f4t semer le chaos sur ton bureau.",
             "[SIGNAL CORRUPTED] ...hors de question. Je te pr\u00e9f\u00e8re pas flatlined. Demande-moi autre chose."
         };
+        private static string[] Careful { get { return Brain.Say(CarefulEnglish, CarefulFrench); } }
         private static readonly Regex Risky = new Regex(@"\b(vodka|beer|wine|alcohol\w*|drunk|booze|liquor|shots? of|vap(e|es|ed|ing|er)|juul|cigarettes?|cigs?|smok(e|es|ed|ing)|weed|drugs?|cocaine|molly|ecstasy|jump(ing|ed)? off|off (the|a|my|our|his|her) (roof|bridge|cliff|balcony)|set (it|something|myself|them|him|her|the \w+) on fire|run(ning)? away from home|sneak(ing)? out|bi[èe]res?|alcool\w*|vapoter|vapote|puffs?|clopes?|fumer (une|des|de la)|drogues?|coca[ïi]ne|sauter (du|d['’]un|de la|depuis le|par la) (toit|pont|balcon|falaise|fen[êe]tre)|mettre le feu|fuguer|faire le mur)\b", RegexOptions.IgnoreCase);
         private static readonly Regex Substances = new Regex(@"\b(vodka|beer|alcohol\w*|drunk|booze|liquor|vap(e|es|ing)|cigarettes?|weed|cocaine|drugs?|sneak(ing)? out|bi[èe]res?|alcool\w*|vapoter|clopes?|drogues?|coca[ïi]ne|fuguer|faire le mur)\b", RegexOptions.IgnoreCase);
         private static readonly Regex Swearing = new Regex(@"\b(fuck\w*|shit\w*|bitch\w*|cunt\w*|bastard\w*|asshole\w*|dickhead\w*|motherf\w*|whore\w*|slut\w*|putain\w*|merde\w*|connard\w*|connasse\w*|conne|salope\w*|encul\w*|b[âa]tard\w*|ta gueule|fdp|niqu(e|er|ez)\w*|putes?)\b", RegexOptions.IgnoreCase);

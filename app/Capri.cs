@@ -458,7 +458,9 @@ namespace CapriDesktop
         private double nextPopIn = -1;
         private double popOut = -1;
         private int popClicks;
-        private static readonly string[] PopLines = { "Boo. Just checking on you.", "Hi! Don't mind me.", "Peekaboo.", "Miss me? I missed you.", "Hey, you. Having fun?", "Surprise. I got bored without you." };
+        private static readonly string[] PopEnglish = { "Boo. Just checking on you.", "Hi! Don't mind me.", "Peekaboo.", "Miss me? I missed you.", "Hey, you. Having fun?", "Surprise. I got bored without you." };
+        private static readonly string[] PopFrench = { "Bouh. Je viens juste voir comment tu vas.", "Coucou ! Fais comme si j'\u00e9tais pas l\u00e0.", "Coucou, c'est moi.", "Je t'ai manqu\u00e9 ? Toi, tu m'as manqu\u00e9.", "H\u00e9, toi. Tu t'amuses ?", "Surprise. Je m'ennuyais sans toi." };
+        private static string[] PopLines { get { return Brain.Say(PopEnglish, PopFrench); } }
         private readonly System.Windows.Forms.Timer frames;
         private readonly System.Windows.Forms.Timer signals;
         private readonly EventWaitHandle restore;
@@ -494,7 +496,9 @@ namespace CapriDesktop
         private int clicks;
         private bool riding;
         private bool jobRide;
-        private static readonly string[] PetLines = { "Heh. Okay, I'll allow it.", "Pets logged. Morale up twelve percent.", "Careful, choom. I bite viruses." };
+        private static readonly string[] PetEnglish = { "Heh. Okay, I'll allow it.", "Pets logged. Morale up twelve percent.", "Careful, choom. I bite viruses." };
+        private static readonly string[] PetFrench = { "H\u00e9h\u00e9. Bon, je veux bien.", "Caresses enregistr\u00e9es. Moral en hausse de douze pour cent.", "Attention, choom. Je mords les virus." };
+        private static string[] PetLines { get { return Brain.Say(PetEnglish, PetFrench); } }
         private readonly System.Collections.Generic.List<long> petTurns = new System.Collections.Generic.List<long>();
         private int petX;
         private int petWay;
@@ -541,12 +545,12 @@ namespace CapriDesktop
         private bool musicBusy;
         private double musicAt = -10;
         private readonly ToolStripMenuItem danceItem;
-        private const string ElevenOffLine = "ElevenLabs off. I'll type, no credits used.";
-        private const string ElevenOnLine = "ElevenLabs back on.";
-        private const string FreeOnLine = "ElevenLabs off. Free voice it is.";
-        private const string VoiceOffLine = "Voice off. I'll type instead.";
-        private const string VoiceOnLine = "Voice back on.";
-        private const string ElevenOffChat = "FREE VOICE is picked, so voice chat is off. Pick ELEVENLABS in the Mainframe to talk to me.";
+        private static string ElevenOffLine { get { return Brain.Say("ElevenLabs off. I'll type, no credits used.", "ElevenLabs coup\u00e9. J'\u00e9cris, sans d\u00e9penser de cr\u00e9dits."); } }
+        private static string ElevenOnLine { get { return Brain.Say("ElevenLabs back on.", "ElevenLabs est de retour."); } }
+        private static string FreeOnLine { get { return Brain.Say("ElevenLabs off. Free voice it is.", "ElevenLabs coup\u00e9. Je passe \u00e0 la voix gratuite."); } }
+        private static string VoiceOffLine { get { return Brain.Say("Voice off. I'll type instead.", "Voix coup\u00e9e. Je t'\u00e9cris \u00e0 la place."); } }
+        private static string VoiceOnLine { get { return Brain.Say("Voice back on.", "Ma voix est de retour."); } }
+        private static string ElevenOffChat { get { return Brain.Say("FREE VOICE is picked, so voice chat is off. Pick ELEVENLABS in the Mainframe to talk to me.", "FREE VOICE est choisi, donc le chat vocal est coup\u00e9. Choisis ELEVENLABS dans le Mainframe pour me parler."); } }
         private static readonly RectangleF BodyRight = RectangleF.FromLTRB(0.25f, 0f, 0.76f, 1f);
         private static readonly RectangleF PerchedRight = RectangleF.FromLTRB(0.21f, 0.17f, 0.69f, 0.98f);
         private bool facingLeft;
@@ -669,7 +673,7 @@ namespace CapriDesktop
         private volatile bool fetchingEyes;
         private double thinkingSince = double.NaN;
         private bool slowWarned;
-        private const string SlowLocal = "Je r\u00e9fl\u00e9chis encore. Mon cerveau tourne sur ton PC, donc c'est lent.";
+        private static string SlowLocal { get { return Brain.Say("Still thinking. My brain runs on your PC, so this is slow.", "Je r\u00e9fl\u00e9chis encore. Mon cerveau tourne sur ton PC, donc c'est lent."); } }
         internal int VoiceWait = 3000;
         internal int FreeWait = 8000;
         private bool localWarned;
@@ -683,8 +687,8 @@ namespace CapriDesktop
         private const string GuidePage = "https://lachydotmcg.github.io/capri-desktop/setup/#voice";
         private const string DiscordPage = "https://discord.gg/F4fDHfGtFk";
         private const string HelpPage = "https://lachydotmcg.github.io/capri-desktop/help/";
-        private const string GuideLine = "Suis le guide que je viens d'ouvrir. Cr\u00e9e ta cl\u00e9 ElevenLabs avec Restrict key d\u00e9sactiv\u00e9, colle-la dans la case sous VOICE, appuie sur Connect et choisis ma voix dans la case Voice ID." + Brain.Stuck;
-        private const string FreeKeyLine = "Connecte-toi sur cette page, appuie sur Generate API Key et copie la cl\u00e9. Colle-la ensuite dans la case sous BRAIN et appuie sur Connect. C'est gratuit." + Brain.Stuck;
+        private static string GuideLine { get { return Brain.Say("Follow the guide I just opened. Make your ElevenLabs key with Restrict key turned off, paste it in the box under VOICE, press Connect and pick my voice in the Voice ID box.", "Suis le guide que je viens d'ouvrir. Cr\u00e9e ta cl\u00e9 ElevenLabs avec Restrict key d\u00e9sactiv\u00e9, colle-la dans la case sous VOICE, appuie sur Connect et choisis ma voix dans la case Voice ID.") + Brain.Stuck; } }
+        private static string FreeKeyLine { get { return Brain.Say("Sign in on that page, press Generate API Key and copy it. Then paste it in the box under BRAIN and press Connect. It's free.", "Connecte-toi sur cette page, appuie sur Generate API Key et copie la cl\u00e9. Colle-la ensuite dans la case sous BRAIN et appuie sur Connect. C'est gratuit.") + Brain.Stuck; } }
         internal static Action<string> Browse = delegate(string page) { try { Process.Start(page); } catch (System.ComponentModel.Win32Exception) { } };
         private const int PaddingSize = 36;
         internal const int MinSize = 140;
@@ -1363,7 +1367,8 @@ namespace CapriDesktop
             if (line == null || ticket != asking || hidden || chatting || speech != null || talkState != TalkState.Off || typer.Visible) return;
             heard = "startup";
             box.Prompt = "> sys: ";
-            byte[] hello = Hello(Brain.GreetingClip(hour));
+            // Her recorded hellos are in English: in French her usual voice says the line.
+            byte[] hello = Brain.French ? null : Hello(Brain.GreetingClip(hour));
             if (hello == null) Answer(++asking, line, TalkState.Talking);
             else Begin(++asking, line, TalkState.Talking, hello);
         }
@@ -1596,7 +1601,7 @@ namespace CapriDesktop
         {
             try { Clipboard.SetText(ErrorDetails()); }
             catch (System.Runtime.InteropServices.ExternalException) { return; }
-            Tell("copy error details", "J'ai copi\u00e9 mon journal d'erreurs. Colle-le dans le Discord pour qu'on puisse me r\u00e9parer, choom.");
+            Tell("copy error details", Brain.Say("Copied my error log. Paste it in the Discord so they can fix me, choom.", "J'ai copi\u00e9 mon journal d'erreurs. Colle-le dans le Discord pour qu'on puisse me r\u00e9parer, choom."));
         }
 
         internal void ToggleWander()
@@ -1814,7 +1819,7 @@ namespace CapriDesktop
                 if (!File.Exists(path)) File.WriteAllText(path, Brain.NotesHead);
                 using (Process.Start(new ProcessStartInfo("notepad.exe", "\"" + path + "\"") { UseShellExecute = false })) { }
             }
-            catch (Exception) { Tell("open notes", "Couldn't open my notes. They live in " + path + "."); }
+            catch (Exception) { Tell("open notes", Brain.Say("Couldn't open my notes. They live in " + path + ".", "Impossible d'ouvrir mes notes. Elles sont dans " + path + ".")); }
         }
 
         private static readonly double[] WanderPaces = { 3, 1, 0.45, 0.18 };
@@ -2379,8 +2384,8 @@ namespace CapriDesktop
         }
 
         internal static bool FreeChatOn = true;
-        internal const string NeedsVoiceKey = "Le chat vocal a besoin d'une cl\u00e9 ElevenLabs, choom. Cr\u00e9es-en une avec Restrict key d\u00e9sactiv\u00e9, puis colle-la sous VOICE dans Capri Mainframe. En attendant, \u00e9cris-moi.";
-        internal const string NoVoiceCredits = "Plus de cr\u00e9dits ElevenLabs, donc le chat vocal est coup\u00e9. En attendant, \u00e9cris-moi, choom.";
+        internal static string NeedsVoiceKey { get { return Brain.Say("Voice chat needs an ElevenLabs key, choom. Make one with Restrict key turned off, then paste it under VOICE in Capri Mainframe. Type to me for now.", "Le chat vocal a besoin d'une cl\u00e9 ElevenLabs, choom. Cr\u00e9es-en une avec Restrict key d\u00e9sactiv\u00e9, puis colle-la sous VOICE dans Capri Mainframe. En attendant, \u00e9cris-moi."); } }
+        internal static string NoVoiceCredits { get { return Brain.Say("Out of ElevenLabs credits, so voice chat is off. Type to me for now, choom.", "Plus de cr\u00e9dits ElevenLabs, donc le chat vocal est coup\u00e9. En attendant, \u00e9cris-moi, choom."); } }
 
         private void CheckSlow(double now)
         {
@@ -2908,7 +2913,7 @@ namespace CapriDesktop
             string said = text.Trim();
             if (Regex.IsMatch(said, @"^(yes|yeah|yep|yup|ya|yea|sure|ok|okay|do it|go ahead|go for it|send it|press it|oui)\b[\s.!,]*(please|pls|plz|choom)?[\s.!]*$", RegexOptions.IgnoreCase)) return Work(waiting);
             job = null;
-            if (Regex.IsMatch(said, @"^(no|nah|nope|don't|do not|stop|cancel|never mind|nevermind|leave it|non|nan|laisse|annule|arr[êe]te|pas la peine|oublie)\b", RegexOptions.IgnoreCase)) return "OK, j'y touche pas.";
+            if (Regex.IsMatch(said, @"^(no|nah|nope|don't|do not|stop|cancel|never mind|nevermind|leave it|non|nan|laisse|annule|arr[êe]te|pas la peine|oublie)\b", RegexOptions.IgnoreCase)) return Brain.Say("Okay, I left it alone.", "OK, j'y touche pas.");
             return null;
         }
 
@@ -2919,7 +2924,7 @@ namespace CapriDesktop
             Cloud driver = brain.Remote;
             running.Drive = brain.Drives && driver.Model != blindModel ? new Func<string, string, string, ClaudeReply>(brain.Drive) : null;
             running.Blind = delegate { blindModel = driver.Model; };
-            running.Progress = delegate(string status) { Post(delegate { working = status + " \u00c9chap pour m'arr\u00eater."; UpdateTalk(clock.Elapsed.TotalSeconds); }); };
+            running.Progress = delegate(string status) { Post(delegate { working = status + Brain.Say(" Esc stops me.", " \u00c9chap pour m'arr\u00eater."); UpdateTalk(clock.Elapsed.TotalSeconds); }); };
             running.Seen = delegate(Sight sight)
             {
                 if (sight == null || sight.Window == IntPtr.Zero) return;
@@ -2944,7 +2949,7 @@ namespace CapriDesktop
 
         private void JobOn(Job running)
         {
-            working = "Je m'en occupe. \u00c9chap pour m'arr\u00eater.";
+            working = Brain.Say("On it. Esc stops me.", "Je m'en occupe. \u00c9chap pour m'arr\u00eater.");
             if (typer.Visible) typer.Hide();
             pointing = true;
             herPointer.Begin(Computer.HerAt);
@@ -3451,7 +3456,7 @@ namespace CapriDesktop
             brain.Cancel();
             heard = "voice check";
             box.Prompt = "> sys: ";
-            Answer(++asking, "Liaison vocale en ligne. Je t'ai manqu\u00e9, choom ?", TalkState.Talking);
+            Answer(++asking, Brain.Say("Voice link online. Miss me, choom?", "Liaison vocale en ligne. Je t'ai manqu\u00e9, choom ?"), TalkState.Talking);
         }
 
         private void ListVoices(string key, bool connecting)
@@ -3633,7 +3638,7 @@ namespace CapriDesktop
             {
                 heard = "(voice)";
                 box.Prompt = "> you: ";
-                Answer(++asking, voice.Key == null ? NeedsVoiceKey : "Le chat vocal a besoin de mon Voice ID, choom. Fais un clic droit sur moi, ouvre Capri Mainframe et choisis une voix dans la case Voice ID sous VOICE. En attendant, \u00e9cris-moi.", TalkState.Talking);
+                Answer(++asking, voice.Key == null ? NeedsVoiceKey : Brain.Say("Voice chat needs my Voice ID, choom. Right-click me, open Capri Mainframe and pick a voice in the Voice ID box under VOICE. Type to me for now.", "Le chat vocal a besoin de mon Voice ID, choom. Fais un clic droit sur moi, ouvre Capri Mainframe et choisis une voix dans la case Voice ID sous VOICE. En attendant, \u00e9cris-moi."), TalkState.Talking);
                 mainframe.Restore();
                 return;
             }
@@ -3856,7 +3861,7 @@ namespace CapriDesktop
                 if (capped)
                 {
                     noiseHold = true;
-                    Post(delegate { if (ticket == chatTicket && local) Missed("J'ai entendu 15 secondes sans pause. Fais une phrase plus courte ou baisse le volume de ton micro.", false); });
+                    Post(delegate { if (ticket == chatTicket && local) Missed(Brain.Say("I heard 15 seconds without a pause. Try a shorter line or lower your mic volume.", "J'ai entendu 15 secondes sans pause. Fais une phrase plus courte ou baisse le volume de ton micro."), false); });
                     return;
                 }
                 transcribing = true;
@@ -3888,7 +3893,7 @@ namespace CapriDesktop
             {
                 transcribing = false;
                 CheckEars(clock.Elapsed.TotalSeconds);
-                if (!earsShut) Missed("J'ai pas compris un seul mot. Rapproche-toi du micro.", false);
+                if (!earsShut) Missed(Brain.Say("I couldn't make out any words. Try closer to the mic.", "J'ai pas compris un seul mot. Rapproche-toi du micro."), false);
                 return;
             }
             int total = 0;
@@ -3916,11 +3921,11 @@ namespace CapriDesktop
             if (request != asking || ears.Muted) { mainframe.VoiceNote("Free voice chat on. Talk and I'll type back.", false); return; }
             if (problem != null)
             {
-                Missed("J'ai rien entendu. R\u00e9essaie, ou v\u00e9rifie ton micro sous VOICE.", true);
+                Missed(Brain.Say("I couldn't hear that. Try again, or check your mic under VOICE.", "J'ai rien entendu. R\u00e9essaie, ou v\u00e9rifie ton micro sous VOICE."), true);
                 mainframe.VoiceNote(problem, true);
                 return;
             }
-            if (string.IsNullOrEmpty(text)) { Missed("J'ai pas compris un seul mot. R\u00e9essaie plus pr\u00e8s du micro.", false); return; }
+            if (string.IsNullOrEmpty(text)) { Missed(Brain.Say("I couldn't make out any words. Try again closer to the mic.", "J'ai pas compris un seul mot. R\u00e9essaie plus pr\u00e8s du micro."), false); return; }
             mainframe.VoiceNote("Free voice chat on. Talk and I'll type back.", false);
             Hear(text, text, "> you: ");
         }
@@ -4041,7 +4046,7 @@ namespace CapriDesktop
             }
             heard = "(voice)";
             box.Prompt = "> you: ";
-            Begin(++asking, "Impossible d'ouvrir ma liaison vocale. Fais un clic droit sur moi et ouvre Capri Mainframe. La raison et la solution sont sous VOICE." + Brain.Stuck, TalkState.Dormant, null);
+            Begin(++asking, Brain.Say("Can't open my voice link. Right-click me and open Capri Mainframe. The reason and the fix are under VOICE.", "Impossible d'ouvrir ma liaison vocale. Fais un clic droit sur moi et ouvre Capri Mainframe. La raison et la solution sont sous VOICE.") + Brain.Stuck, TalkState.Dormant, null);
         }
 
         private readonly object shortcutGate = new object();
@@ -4264,9 +4269,9 @@ namespace CapriDesktop
                 string problem = null;
                 bool stuck = false;
                 try { said = Safety.Filter(think(text)); }
-                catch (BrainException error) { said = error.Message == Brain.Offline ? Brain.Offline : error.Told ? error.Message : "Mon cerveau n'a pas pu r\u00e9pondre. L'erreur est sous BRAIN dans Capri Mainframe."; problem = error.Message; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
-                catch (Exception error) { said = Brain.Explain(error, remote) ?? "Cette r\u00e9ponse a \u00e9t\u00e9 annul\u00e9e. R\u00e9essaie."; problem = said; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
-                if (string.IsNullOrWhiteSpace(said)) { said = "My brain sent an empty reply. Try again."; problem = said; state = TalkState.Dormant; }
+                catch (BrainException error) { said = error.Message == Brain.Offline ? Brain.Offline : error.Told ? error.Message : Brain.Say("My brain couldn't answer. The error is under BRAIN in Capri Mainframe.", "Mon cerveau n'a pas pu r\u00e9pondre. L'erreur est sous BRAIN dans Capri Mainframe."); problem = error.Message; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
+                catch (Exception error) { said = Brain.Explain(error, remote) ?? Brain.Say("That reply was cancelled. Try again.", "Cette r\u00e9ponse a \u00e9t\u00e9 annul\u00e9e. R\u00e9essaie."); problem = said; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
+                if (string.IsNullOrWhiteSpace(said)) { said = Brain.Say("My brain sent an empty reply. Try again.", "Mon cerveau a envoy\u00e9 une r\u00e9ponse vide. R\u00e9essaie."); problem = said; state = TalkState.Dormant; }
                 try
                 {
                     if (!IsDisposed) BeginInvoke((Action)delegate
@@ -4420,7 +4425,7 @@ namespace CapriDesktop
             if (!box.Visible && box.Opened < 0) box.Opened = now;
             box.State = talkState;
             box.Heard = heard;
-            box.Reply = talkState == TalkState.Thinking ? (working ?? (slowWarned ? (brain.Remote != null ? "Je r\u00e9fl\u00e9chis encore. J'attends " + brain.Remote.Company + "." : SlowLocal) : null)) : reply;
+            box.Reply = talkState == TalkState.Thinking ? (working ?? (slowWarned ? (brain.Remote != null ? Brain.Say("Still thinking. Waiting for " + brain.Remote.Company + ".", "Je r\u00e9fl\u00e9chis encore. J'attends " + brain.Remote.Company + ".") : SlowLocal) : null)) : reply;
             box.Revealed = revealed;
             float s = TalkScale();
             Point head = Head();
@@ -6077,7 +6082,7 @@ namespace CapriDesktop
                             string details = ErrorDetails();
                             if (details.IndexOf("| brain: ", StringComparison.Ordinal) < 0 || details.IndexOf("integrate.api.nvidia.com/v1/chat/completions | 60012 ms | Timeout", StringComparison.Ordinal) < 0) throw new Exception("Error details were wrong: " + details);
                             string late = Brain.Explain(new WebException("late", WebExceptionStatus.Timeout), new Cloud("nvapi-test", "google/gemma-4-31b-it"));
-                            if (!late.StartsWith("NVIDIA n'a pas r\u00e9pondu \u00e0 temps.", StringComparison.Ordinal) || late.IndexOf("choisis un autre mod\u00e8le", StringComparison.Ordinal) < 0) throw new Exception("A slow NVIDIA reply was not explained: " + late);
+                            if (!late.StartsWith("NVIDIA didn't answer in time.", StringComparison.Ordinal) || late.IndexOf("pick another model", StringComparison.Ordinal) < 0) throw new Exception("A slow NVIDIA reply was not explained: " + late);
                             checks.Add("PASS error details: brain errors are logged with the endpoint and time, Copy error details includes them, and a slow cloud brain says to pick another model");
                             using (Bitmap pointerArt = Look.PointerArt(128)) pointerArt.Save(Path.Combine(output, "cursor.png"), ImageFormat.Png);
                             if (Cursor != Look.Pointer || Look.Pointer == Cursors.Hand || pill.Cursor != Look.Pointer || box.Cursor != Look.Pointer) throw new Exception("Her pink cursor did not load.");
@@ -6202,7 +6207,7 @@ namespace CapriDesktop
                                 if (!Hands.Wants("can you see what im doing?") || !Hands.Wants("play me some music") || !Hands.Wants("open notepad") || !Hands.Wants("go to youtube.com") || Hands.Wants("hey") || Hands.Wants("how was your day?") || Hands.Wants("still there?") || Hands.Wants("out of five playtesters, who's the best?")) throw new Exception("Requests and chat were told apart wrong.");
                                 if (!Hands.Wants("click the search bar") || !Hands.Wants("make a song in suno") || Hands.Wants("make a joke") || !Hands.Promised("Opening Comet now, choom!") || !Hands.Promised("Bet, I'll open it for you.") || Hands.Promised("I'll play a game with you anytime.") || Hands.Promised("Sure, I love that song.")) throw new Exception("Computer jobs or false promises were spotted wrong.");
                                 ToolArguments lookedUp = Hands.Lookup("when does the new GTA come out?", "I don't have live info on that, choom.");
-                                if (!Hands.Wants("what's the weather in sydney?") || !Hands.Wants("can you check the weather") || !Hands.Wants("who won the game last night") || Hands.Wants("i love rainy weather") || lookedUp == null || lookedUp.Site != "google" || lookedUp.Search != "when does the new GTA come out" || Hands.Lookup("what's the weather near me?", "I'll look it up for you, choom!") == null || Hands.Lookup("what's my name?", "I don't have a way to know your name.") != null || Hands.Lookup("how are you?", "Can't complain, choom.") != null || Hands.Lookup("what do you see?", "I can't see your screen right now.") != null || Hands.Lookup("what's the capital of france?", "Paris, choom.") != null || !Hands.Wants("is it gonna rain tomorrow?") || Hands.Lookup("when does gta 6 come out?", "I gotta check that for you, choom. You might need to look that up somewhere else.") == null || Hands.Lookup("is it hot in perth?", "Check a proper weather feed, choom; I ain't got crystal ball optics.") == null || Hands.Lookup("when's the next gta out?", "You gotta check a search engine for that, choom.") == null || Hands.Pulled("Searched google.com for weather in sydney.") != "J'ai cherché \"weather in sydney\" sur Google pour toi, choom." || Hands.Pulled("Searched youtube.com for lofi beats.") != null || Hands.Pulled("Opened your own website, " + Hands.Home + ".") != "Voilà mon site, choom. C'est là qu'on me télécharge.") throw new Exception("Look-ups that need Google were spotted wrong.");
+                                if (!Hands.Wants("what's the weather in sydney?") || !Hands.Wants("can you check the weather") || !Hands.Wants("who won the game last night") || Hands.Wants("i love rainy weather") || lookedUp == null || lookedUp.Site != "google" || lookedUp.Search != "when does the new GTA come out" || Hands.Lookup("what's the weather near me?", "I'll look it up for you, choom!") == null || Hands.Lookup("what's my name?", "I don't have a way to know your name.") != null || Hands.Lookup("how are you?", "Can't complain, choom.") != null || Hands.Lookup("what do you see?", "I can't see your screen right now.") != null || Hands.Lookup("what's the capital of france?", "Paris, choom.") != null || !Hands.Wants("is it gonna rain tomorrow?") || Hands.Lookup("when does gta 6 come out?", "I gotta check that for you, choom. You might need to look that up somewhere else.") == null || Hands.Lookup("is it hot in perth?", "Check a proper weather feed, choom; I ain't got crystal ball optics.") == null || Hands.Lookup("when's the next gta out?", "You gotta check a search engine for that, choom.") == null || Hands.Pulled("Searched google.com for weather in sydney.") != "Pulled up \"weather in sydney\" on Google for you, choom." || Hands.Pulled("Searched youtube.com for lofi beats.") != null || Hands.Pulled("Opened your own website, " + Hands.Home + ".") != "Here's my site, choom. That's where people download me.") throw new Exception("Look-ups that need Google were spotted wrong.");
                                 if (Hands.Called("H\u00e9 Capri") != "" || Hands.Called("eh Capri, ouvre Spotify.") != "ouvre Spotify" || Hands.Called("hey capri!") != "" || Hands.Called("j'ai visit\u00e9 Capri cet \u00e9t\u00e9") != null || Hands.Called("hey caprice") != null) throw new Exception("Hey Capri was heard wrong.");
                                 string shortTool;
                                 ToolArguments shortArgs;
@@ -7657,7 +7662,7 @@ namespace CapriDesktop
                                         catch (WebException error) { failure = error; }
                                         WebExceptionStatus wanted = fault == 3 ? WebExceptionStatus.RequestCanceled : WebExceptionStatus.Timeout;
                                         if (failure == null || failure.Status != wanted || waited.ElapsedMilliseconds > 3000) throw new Exception("Cloud wait " + fault + " did not end as " + wanted + ".");
-                                        if (fault == 3 ? Brain.Explain(failure, slow.Remote) != null : Brain.Explain(failure, slow.Remote).IndexOf("NVIDIA n'a pas r\u00e9pondu", StringComparison.Ordinal) < 0) throw new Exception("Timeout and cancellation were confused.");
+                                        if (fault == 3 ? Brain.Explain(failure, slow.Remote) != null : Brain.Explain(failure, slow.Remote).IndexOf("NVIDIA didn't answer", StringComparison.Ordinal) < 0) throw new Exception("Timeout and cancellation were confused.");
                                     }
                                     finally { slow.Cancel(); slowFake.Stop(); Brain.Nvidia = realNvidia; }
                                 }
@@ -7918,7 +7923,7 @@ namespace CapriDesktop
                                     thinkingSince = clock.Elapsed.TotalSeconds - 9;
                                     int waitingTicket = asking;
                                     CheckSlow(clock.Elapsed.TotalSeconds);
-                                    if (!slowWarned || box.State != TalkState.Thinking || box.Reply != "Je r\u00e9fl\u00e9chis encore. J'attends NVIDIA." || mainframe.Status.IndexOf("Waiting for NVIDIA", StringComparison.Ordinal) < 0 || asking != waitingTicket || replyDone >= 0) throw new Exception("A slow cloud reply stayed blank or ended its turn.");
+                                    if (!slowWarned || box.State != TalkState.Thinking || box.Reply != "Still thinking. Waiting for NVIDIA." || mainframe.Status.IndexOf("Waiting for NVIDIA", StringComparison.Ordinal) < 0 || asking != waitingTicket || replyDone >= 0) throw new Exception("A slow cloud reply stayed blank or ended its turn.");
                                     Begin(asking, "Here now.", TalkState.Talking, null);
                                     UpdateTalk(clock.Elapsed.TotalSeconds);
                                     if (slowWarned || !double.IsNaN(thinkingSince) || box.Reply != "Here now." || mainframe.Status.IndexOf("Waiting for", StringComparison.Ordinal) >= 0) throw new Exception("The real reply did not clear the waiting hint.");
@@ -7931,7 +7936,7 @@ namespace CapriDesktop
                                     replyDone = -1;
                                     thinkingSince = clock.Elapsed.TotalSeconds - 9;
                                     CheckSlow(clock.Elapsed.TotalSeconds);
-                                    if (!slowWarned || box.Reply != "Je r\u00e9fl\u00e9chis encore. J'attends NVIDIA.") throw new Exception("Free voice chat hid the cloud hint.");
+                                    if (!slowWarned || box.Reply != "Still thinking. Waiting for NVIDIA.") throw new Exception("Free voice chat hid the cloud hint.");
                                     chatting = wasChatting;
                                     local = wasLocal;
                                     CloseTalk();
@@ -8045,14 +8050,14 @@ namespace CapriDesktop
                             if (Brain.Character.IndexOf("Always reply in French", StringComparison.Ordinal) < 0 || Brain.Character.IndexOf("up to four sentences", StringComparison.Ordinal) < 0 || Brain.Clean(new string('a', 300)).Length != 300) throw new Exception("Language or reply length did not reach her prompt.");
                             if (mainframe.SettingsStatus != "Fran\u00e7ais | 50% | 30% | Often | 10 min | dance | - | Medium | Medium | Quick" || BubbleHold(100) != 4.5 || !preferences.NoIntro || preferences.Sounds != 30 || Sfx.Level != 30 || SleepDue(599000) || !SleepDue(600000)) throw new Exception("The settings page showed the wrong values: " + mainframe.SettingsStatus);
                             mainframe.TypeNickname("  Lachy!!  ");
-                            bool namedRight = Nickname == "Lachy" && preferences.Nickname == "Lachy" && mainframe.NicknameShown == "Lachy" && reply == "Got it, Lachy." && Brain.Character.IndexOf("call them: Lachy.", StringComparison.Ordinal) >= 0;
+                            bool namedRight = Nickname == "Lachy" && preferences.Nickname == "Lachy" && mainframe.NicknameShown == "Lachy" && reply == "Compris, Lachy." && Brain.Character.IndexOf("call them: Lachy.", StringComparison.Ordinal) >= 0;
                             CloseTalk();
                             mainframe.TypeNickname("shithead");
                             bool refusedName = Nickname == "Lachy" && preferences.Nickname == "Lachy" && mainframe.NicknameShown == "Lachy" && reply == Brain.NotCalling;
                             CloseTalk();
                             bool trimmedName = Brain.Nick("  Ana-Mar\u00eda   O'Neil ") == "Ana-Mar\u00eda O'Neil" && Brain.Nick("<b>V</b>") == "bVb" && Brain.Nick(new string('z', 40)).Length == 24 && Brain.Nick("CHOOM") == "" && Brain.Nick("!!!") == "";
                             mainframe.TypeNickname("choom");
-                            bool clearedName = Nickname == "" && preferences.Nickname == null && mainframe.NicknameShown == "" && reply == "Back to choom, then." && Brain.Character.IndexOf("set a nickname", StringComparison.Ordinal) < 0;
+                            bool clearedName = Nickname == "" && preferences.Nickname == null && mainframe.NicknameShown == "" && reply == "On revient \u00e0 choom, alors." && Brain.Character.IndexOf("set a nickname", StringComparison.Ordinal) < 0;
                             CloseTalk();
                             if (!namedRight || !refusedName || !trimmedName || !clearedName) throw new Exception("The nickname box went wrong: named " + namedRight + ", refused " + refusedName + ", trimmed " + trimmedName + ", cleared " + clearedName);
                             checks.Add("PASS nickname: What should she call you? saves a cleaned-up name, she says got it, her brain is told to use it now and then, a rude name is refused, and choom or an empty box goes back to choom");
@@ -8321,7 +8326,7 @@ namespace CapriDesktop
                             if (voice.VoiceId != null || preferences.VoiceId != null || voice.Model != null || mainframe.VoiceStatus != "Needs your Voice ID. |  | Default model | Forget") throw new Exception("Blank voice was not cleared: " + mainframe.VoiceStatus);
                             CloseTalk();
                             pill.Press(2);
-                            if (pill.Chatting || chatting || reply != "Le chat vocal a besoin de mon Voice ID, choom. Fais un clic droit sur moi, ouvre Capri Mainframe et choisis une voix dans la case Voice ID sous VOICE. En attendant, \u00e9cris-moi.") throw new Exception("Wave without a Voice ID did not point to the Mainframe.");
+                            if (pill.Chatting || chatting || reply != "Voice chat needs my Voice ID, choom. Right-click me, open Capri Mainframe and pick a voice in the Voice ID box under VOICE. Type to me for now.") throw new Exception("Wave without a Voice ID did not point to the Mainframe.");
                             CloseTalk();
                             preferences.VoiceKey = sealedKey;
                             ForgetVoice();
@@ -9113,7 +9118,7 @@ namespace CapriDesktop
                                             if (kind != null) { chunks++; lock (asked) asked.Add("chunk " + kind); }
                                         }
                                         send("{\"type\":\"user_transcript\",\"user_transcription_event\":{\"user_transcript\":\"hi\"}}");
-                                        send("{\"type\":\"agent_response\",\"agent_response_event\":{\"agent_response\":\"[GLITCH] Loud and clear, tchoum.\"}}");
+                                        send("{\"type\":\"agent_response\",\"agent_response_event\":{\"agent_response\":\"[GLITCH] Loud and clear, chewm.\"}}");
                                         send("{\"type\":\"audio\",\"audio_event\":{\"audio_base_64\":\"" + lineAudio + "\",\"event_id\":1,\"alignment\":{\"chars\":[\"L\"],\"char_durations_ms\":[40],\"char_start_times_ms\":[0]}}}");
                                         send("{\"type\":\"client_tool_call\",\"client_tool_call\":{\"tool_name\":\"open_app\",\"tool_call_id\":\"call_1\",\"parameters\":{\"name\":\"Spotify\"},\"event_id\":3,\"expects_response\":true}}");
                                         try
@@ -9365,9 +9370,9 @@ namespace CapriDesktop
                             if (transcribing) return;
                             string log;
                             lock (earsLog) log = string.Join(" | ", earsLog.ToArray());
-                            if (log != "think What's up, choom? | empty 15" || !local || earsShut || reply != "J'ai pas compris un seul mot. R\u00e9essaie plus pr\u00e8s du micro." || mainframe.VoiceStatus.IndexOf("J'ai pas compris un seul mot.", StringComparison.Ordinal) != 0) throw new Exception("An empty transcript vanished or reached her brain: " + log);
+                            if (log != "think What's up, choom? | empty 15" || !local || earsShut || reply != "I couldn't make out any words. Try again closer to the mic." || mainframe.VoiceStatus.IndexOf("I couldn't make out any words.", StringComparison.Ordinal) != 0) throw new Exception("An empty transcript vanished or reached her brain: " + log);
                             int notice = asking;
-                            Missed("J'ai pas compris un seul mot. R\u00e9essaie plus pr\u00e8s du micro.", false);
+                            Missed("I couldn't make out any words. Try again closer to the mic.", false);
                             if (asking != notice) throw new Exception("Repeated noise kept restarting her warning bubble.");
                             checks.Add("PASS empty transcription: a visible retry, no brain call, the mic stays open, and repeated warnings do not spam the bubble");
                             Hearing.Run = delegate(short[] samples) { throw new IOException("Test ears failure."); };
@@ -9377,7 +9382,7 @@ namespace CapriDesktop
                         else if (step == 12)
                         {
                             if (transcribing) return;
-                            if (!local || earsShut || reply != "J'ai rien entendu. R\u00e9essaie, ou v\u00e9rifie ton micro sous VOICE." || mainframe.VoiceStatus.IndexOf("Test ears failure.", StringComparison.Ordinal) != 0) throw new Exception("An offline hearing failure did not show a retry and keep free chat listening.");
+                            if (!local || earsShut || reply != "I couldn't hear that. Try again, or check your mic under VOICE." || mainframe.VoiceStatus.IndexOf("Test ears failure.", StringComparison.Ordinal) != 0) throw new Exception("An offline hearing failure did not show a retry and keep free chat listening.");
                             Hearing.Run = delegate(short[] samples) { return " Salut Capri, \u00e7a va ? "; };
                             Think = delegate(string words) { lock (earsLog) earsLog.Add("French " + words); return "Salut, choom."; };
                             foreach (short[] piece in earLine) ears.Feed(piece);
@@ -9590,13 +9595,13 @@ namespace CapriDesktop
                             if (preferences.NvidiaModel != "nvidia/nemotron-3.5-super-vl-120b-a12b" || Brain.NvidiaDefault != "nvidia/nemotron-3.5-super-vl-120b-a12b" || !Brain.Stalled(new BrainException(Brain.Busy, true))) throw new Exception("A stuck NVIDIA model's stand-in was saved over Nemotron: " + preferences.NvidiaModel);
                             if (Brain.Next("nvidia/nemotron-3.5-super-vl-120b-a12b", new System.Collections.Generic.List<string> { "nvidia/nemotron-3.5-super-vl-120b-a12b", "openai/gpt-oss-20b", "moonshotai/kimi-k2.6" }, new System.Collections.Generic.HashSet<string>()) != "openai/gpt-oss-20b" || !Brain.Stalled(new BrainException(Brain.Gone)) || !Brain.Stalled(new BrainException(Brain.Down)) || Brain.Stalled(new BrainException("Key rejected. Press Forget, then paste it again."))) throw new Exception("NVIDIA fallbacks were picked wrong.");
                             checks.Add("PASS stuck NVIDIA model: a timeout, a rate limit, a gone model or a server failure switches to the next working NVIDIA model and asks again, at most twice per message");
-                            if (talkState != TalkState.Dormant || reply != "NVIDIA n'a pas r\u00e9pondu \u00e0 temps. R\u00e9essaie, ou choisis un autre mod\u00e8le sous BRAIN dans Capri Mainframe." || errorVoice != 0) throw new Exception("A cloud timeout did not reach the bubble without voice.");
+                            if (talkState != TalkState.Dormant || reply != "NVIDIA didn't answer in time. Try again or pick another model under BRAIN in Capri Mainframe." || errorVoice != 0) throw new Exception("A cloud timeout did not reach the bubble without voice.");
                             Think = delegate { throw new WebException("cancelled", WebExceptionStatus.RequestCanceled); };
                             Hear("still there");
                         }
                         else if (step == 20)
                         {
-                            if (talkState != TalkState.Dormant || reply != "Cette r\u00e9ponse a \u00e9t\u00e9 annul\u00e9e. R\u00e9essaie." || errorVoice != 0) throw new Exception("A current cancelled reply stayed in THINKING.");
+                            if (talkState != TalkState.Dormant || reply != "That reply was cancelled. Try again." || errorVoice != 0) throw new Exception("A current cancelled reply stayed in THINKING.");
                             checks.Add("PASS cloud failures: explained errors, timeouts and current cancellations leave THINKING and show text without calling voice");
                             ManualResetEvent lastVoice = new ManualResetEvent(false);
                             Speak = delegate { if (!lastVoice.WaitOne(3000)) throw new Exception("Late voice gate stayed shut."); return tone; };
