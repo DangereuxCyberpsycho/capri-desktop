@@ -1,0 +1,7 @@
+build/out/
+build/setup-out/
+build/bin/
+build/obj/
+smoke/
+cross/bin/
+cross/obj/

@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Builds Capri.exe, the Windows app. See build/README.md. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>Capri</AssemblyName>
+    <RootNamespace>CapriDesktop</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ApplicationManifest>../app/app.manifest</ApplicationManifest>
+    <ApplicationIcon>../assets/chip.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>$(NoWarn);CS0649;CS0169;CS0414</NoWarn>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../app/*.cs" Exclude="../app/Setup.cs" />
+    <EmbeddedResource Include="../assets/sprites/*.png" LogicalName="Capri.Sprite.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../assets/chip.ico" LogicalName="Capri.Chip.ico" />
+    <EmbeddedResource Include="../assets/chip.png" LogicalName="Capri.Chip.png" />
+    <EmbeddedResource Include="../assets/fonts/ShareTechMono-Regular.ttf" LogicalName="Capri.Font.Mono.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Speech" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="UIAutomationClient" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.26100.1742" />
+  </ItemGroup>
+</Project>

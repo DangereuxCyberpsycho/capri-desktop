@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Builds Capri-Setup.exe, the installer. Build Capri.App.csproj first. See build/README.md. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>Capri-Setup</AssemblyName>
+    <RootNamespace>CapriSetup</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ApplicationManifest>../app/app.manifest</ApplicationManifest>
+    <ApplicationIcon>../assets/chip.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <DebugType>none</DebugType>
+    <AppExe Condition="'$(AppExe)' == ''">$(MSBuildThisFileDirectory)out/Capri.exe</AppExe>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../app/Setup.cs" />
+    <Compile Include="../app/AssemblyInfo.cs" />
+    <EmbeddedResource Include="$(AppExe)" LogicalName="Capri.App.exe" />
+    <EmbeddedResource Include="../assets/chip.ico" LogicalName="Capri.Chip.ico" />
+    <EmbeddedResource Include="../assets/chip.png" LogicalName="Capri.Chip.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

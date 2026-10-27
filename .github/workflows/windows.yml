@@ -1,0 +1,47 @@
+name: Windows
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - name: Build
+        shell: pwsh
+        run: |
+          dotnet build build/Capri.App.csproj -c Release -o build/out
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          dotnet build build/Capri.Setup.csproj -c Release -o build/setup-out
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Smoke test
+        shell: pwsh
+        timeout-minutes: 15
+        run: |
+          $smoke = Join-Path $PWD "smoke"
+          $run = Start-Process -FilePath build/out/Capri.exe -ArgumentList "--smoke-test", "`"$smoke`"" -PassThru -Wait
+          if (Test-Path "$smoke/smoke-test.txt") { Get-Content "$smoke/smoke-test.txt" }
+          if (Test-Path "$smoke/failure.txt") { Get-Content "$smoke/failure.txt"; exit 1 }
+          if ($run.ExitCode -ne 0) { Write-Host "Capri exited with $($run.ExitCode)"; exit 1 }
+          if (-not (Test-Path "$smoke/smoke-test.txt")) { Write-Host "No smoke test results"; exit 1 }
+          if (Select-String -Path "$smoke/smoke-test.txt" -Pattern '^FAIL' -Quiet) { exit 1 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test
+          path: smoke/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Capri-windows
+          path: |
+            build/out/Capri.exe
+            build/setup-out/Capri-Setup.exe
