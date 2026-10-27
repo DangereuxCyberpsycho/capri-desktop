@@ -22,3 +22,10 @@ dotnet build build/Capri.Setup.csproj -c Release -o build/setup-out
 3. Lance `build/out/Capri.exe`, ou installe avec `build/setup-out/Capri-Setup.exe`.
 
 Auto-tests : `build/out/Capri.exe --smoke-test smoke`, puis regarde `smoke/smoke-test.txt` (une ligne `FAIL` = un test raté, `smoke/failure.txt` = un plantage).
+
+## Publier une nouvelle version
+
+1. Augmente le numéro dans `app/AssemblyInfo.cs` (les deux lignes) et dans `cross/Capri.Cross.csproj`.
+2. Fusionne dans `main`.
+
+Si les tests passent, le workflow crée la release `vX.Y.Z` avec `Capri-Setup.exe`, `Capri.exe` et `SHA256SUMS.txt`. Les Capri installées la trouvent d'elles-mêmes (vérification toutes les 3 heures, ou clic droit → Check for updates). Le dépôt doit être public pour que l'appli puisse lire les releases.
