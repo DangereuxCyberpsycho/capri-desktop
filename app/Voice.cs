@@ -90,7 +90,7 @@ namespace CapriDesktop
             return Regex.IsMatch(words, @"[\p{L}\p{Nd}]") ? words : "";
         }
 
-        private static readonly string[,] Respelled = { { "chooms", "chewms" }, { "choom", "chewm" }, { "preem", "preme" }, { "yezzirrr", "yessirrr" } };
+        private static readonly string[,] Respelled = { { "chooms", "tchoums" }, { "choom", "tchoum" }, { "preem", "pr\u00eeme" }, { "yezzirrr", "yessirrr" } };
 
         internal static string Sayable(string text) { return Swap(text, 0, 1); }
 

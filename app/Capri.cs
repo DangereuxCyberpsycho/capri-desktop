@@ -518,8 +518,8 @@ namespace CapriDesktop
         private const string FreeKeyPage = "https://build.nvidia.com/settings/api-keys";
         private const string GuidePage = "https://lachydotmcg.github.io/capri-desktop/setup/#voice";
         private const string DiscordPage = "https://discord.gg/F4fDHfGtFk";
-        private const string GuideLine = "Follow the guide I just opened. Make your ElevenLabs key with Restrict key turned off, paste it in the box under VOICE, press Connect and pick my voice in the Voice ID box." + Brain.Stuck;
-        private const string FreeKeyLine = "Sign in on that page, press Generate API Key and copy it. Then paste it in the box under BRAIN and press Connect. It's free." + Brain.Stuck;
+        private const string GuideLine = "Suis le guide que je viens d'ouvrir. Cr\u00e9e ta cl\u00e9 ElevenLabs avec Restrict key d\u00e9sactiv\u00e9, colle-la dans la case sous VOICE, appuie sur Connect et choisis ma voix dans la case Voice ID." + Brain.Stuck;
+        private const string FreeKeyLine = "Connecte-toi sur cette page, appuie sur Generate API Key et copie la cl\u00e9. Colle-la ensuite dans la case sous BRAIN et appuie sur Connect. C'est gratuit." + Brain.Stuck;
         internal static Action<string> Browse = delegate(string page) { try { Process.Start(page); } catch (System.ComponentModel.Win32Exception) { } };
         private const int PaddingSize = 36;
         private const int DismountId = 0x4361;
@@ -1791,7 +1791,7 @@ namespace CapriDesktop
             string said = text.Trim();
             if (Regex.IsMatch(said, @"^(yes|yeah|yep|yup|ya|yea|sure|ok|okay|do it|go ahead|go for it|send it|press it|oui)\b[\s.!,]*(please|pls|plz|choom)?[\s.!]*$", RegexOptions.IgnoreCase)) return Work(waiting);
             job = null;
-            if (Regex.IsMatch(said, @"^(no|nah|nope|don't|do not|stop|cancel|never mind|nevermind|leave it|non)\b", RegexOptions.IgnoreCase)) return "Okay, I left it alone.";
+            if (Regex.IsMatch(said, @"^(no|nah|nope|don't|do not|stop|cancel|never mind|nevermind|leave it|non|nan|laisse|annule|arr[êe]te|pas la peine|oublie)\b", RegexOptions.IgnoreCase)) return "OK, j'y touche pas.";
             return null;
         }
 
@@ -1800,7 +1800,7 @@ namespace CapriDesktop
             job = running;
             running.Think = delegate(string system, string user, System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, ToolArguments>> calls) { return brain.Step(system, user, Computer.Tools, Computer.ClaudeTools, Computer.Listing, calls); };
             running.Progress = delegate(string status) { Post(delegate { working = status + " Esc stops me."; UpdateTalk(clock.Elapsed.TotalSeconds); }); };
-            Post(delegate { working = "On it. Esc stops me."; if (typer.Visible) typer.Hide(); PassThrough(true); UpdateTalk(clock.Elapsed.TotalSeconds); });
+            Post(delegate { working = "Je m'en occupe. \u00c9chap pour m'arr\u00eater."; if (typer.Visible) typer.Hide(); PassThrough(true); UpdateTalk(clock.Elapsed.TotalSeconds); });
             try { return running.Run(); }
             finally
             {
@@ -2374,7 +2374,7 @@ namespace CapriDesktop
             {
                 transcribing = false;
                 CheckEars(clock.Elapsed.TotalSeconds);
-                if (!earsShut) Missed("I couldn't make out any words. Try closer to the mic.", false);
+                if (!earsShut) Missed("J'ai pas compris un seul mot. Rapproche-toi du micro.", false);
                 return;
             }
             int total = 0;
@@ -2402,11 +2402,11 @@ namespace CapriDesktop
             if (request != asking || ears.Muted) { mainframe.VoiceNote("Free voice chat on. Talk and I'll type back.", false); return; }
             if (problem != null)
             {
-                Missed("I couldn't hear that. Try again, or check your mic under VOICE.", true);
+                Missed("J'ai rien entendu. R\u00e9essaie, ou v\u00e9rifie ton micro sous VOICE.", true);
                 mainframe.VoiceNote(problem, true);
                 return;
             }
-            if (string.IsNullOrEmpty(text)) { Missed("I couldn't make out any words. Try again closer to the mic.", false); return; }
+            if (string.IsNullOrEmpty(text)) { Missed("J'ai pas compris un seul mot. R\u00e9essaie plus pr\u00e8s du micro.", false); return; }
             mainframe.VoiceNote("Free voice chat on. Talk and I'll type back.", false);
             Hear(text, text, "> you: ");
         }
@@ -2519,7 +2519,7 @@ namespace CapriDesktop
             }
             heard = "(voice)";
             box.Prompt = "> you: ";
-            Begin(++asking, "Can't open my voice link. Right-click me and open Capri Mainframe. The reason and the fix are under VOICE." + Brain.Stuck, TalkState.Dormant, null);
+            Begin(++asking, "Impossible d'ouvrir ma liaison vocale. Fais un clic droit sur moi et ouvre Capri Mainframe. La raison et la solution sont sous VOICE." + Brain.Stuck, TalkState.Dormant, null);
         }
 
         private readonly object shortcutGate = new object();
@@ -3808,7 +3808,7 @@ namespace CapriDesktop
                                 if (!Hands.Wants("can you see what im doing?") || !Hands.Wants("play me some music") || !Hands.Wants("open notepad") || !Hands.Wants("go to youtube.com") || Hands.Wants("hey") || Hands.Wants("how was your day?") || Hands.Wants("still there?") || Hands.Wants("out of five playtesters, who's the best?")) throw new Exception("Requests and chat were told apart wrong.");
                                 if (!Hands.Wants("click the search bar") || !Hands.Wants("make a song in suno") || Hands.Wants("make a joke") || !Hands.Promised("Opening Comet now, choom!") || !Hands.Promised("Bet, I'll open it for you.") || Hands.Promised("I'll play a game with you anytime.") || Hands.Promised("Sure, I love that song.")) throw new Exception("Computer jobs or false promises were spotted wrong.");
                                 ToolArguments lookedUp = Hands.Lookup("when does the new GTA come out?", "I don't have live info on that, choom.");
-                                if (!Hands.Wants("what's the weather in sydney?") || !Hands.Wants("can you check the weather") || !Hands.Wants("who won the game last night") || Hands.Wants("i love rainy weather") || lookedUp == null || lookedUp.Site != "google" || lookedUp.Search != "when does the new GTA come out" || Hands.Lookup("what's the weather near me?", "I'll look it up for you, choom!") == null || Hands.Lookup("what's my name?", "I don't have a way to know your name.") != null || Hands.Lookup("how are you?", "Can't complain, choom.") != null || Hands.Lookup("what do you see?", "I can't see your screen right now.") != null || Hands.Lookup("what's the capital of france?", "Paris, choom.") != null || !Hands.Wants("is it gonna rain tomorrow?") || Hands.Lookup("when does gta 6 come out?", "I gotta check that for you, choom. You might need to look that up somewhere else.") == null || Hands.Lookup("is it hot in perth?", "Check a proper weather feed, choom; I ain't got crystal ball optics.") == null || Hands.Lookup("when's the next gta out?", "You gotta check a search engine for that, choom.") == null || Hands.Pulled("Searched google.com for weather in sydney.") != "Pulled up \"weather in sydney\" on Google for you, choom." || Hands.Pulled("Searched youtube.com for lofi beats.") != null || Hands.Pulled("Opened your own website, " + Hands.Home + ".") != "Here's my site, choom. That's where people download me.") throw new Exception("Look-ups that need Google were spotted wrong.");
+                                if (!Hands.Wants("what's the weather in sydney?") || !Hands.Wants("can you check the weather") || !Hands.Wants("who won the game last night") || Hands.Wants("i love rainy weather") || lookedUp == null || lookedUp.Site != "google" || lookedUp.Search != "when does the new GTA come out" || Hands.Lookup("what's the weather near me?", "I'll look it up for you, choom!") == null || Hands.Lookup("what's my name?", "I don't have a way to know your name.") != null || Hands.Lookup("how are you?", "Can't complain, choom.") != null || Hands.Lookup("what do you see?", "I can't see your screen right now.") != null || Hands.Lookup("what's the capital of france?", "Paris, choom.") != null || !Hands.Wants("is it gonna rain tomorrow?") || Hands.Lookup("when does gta 6 come out?", "I gotta check that for you, choom. You might need to look that up somewhere else.") == null || Hands.Lookup("is it hot in perth?", "Check a proper weather feed, choom; I ain't got crystal ball optics.") == null || Hands.Lookup("when's the next gta out?", "You gotta check a search engine for that, choom.") == null || Hands.Pulled("Searched google.com for weather in sydney.") != "J'ai cherché \"weather in sydney\" sur Google pour toi, choom." || Hands.Pulled("Searched youtube.com for lofi beats.") != null || Hands.Pulled("Opened your own website, " + Hands.Home + ".") != "Voilà mon site, choom. C'est là qu'on me télécharge.") throw new Exception("Look-ups that need Google were spotted wrong.");
                                 string shortTool;
                                 ToolArguments shortArgs;
                                 if (!Hands.Direct("capri, open your website", out shortTool, out shortArgs) || shortTool != "open_website" || shortArgs.Site != Hands.Home || !Hands.Direct("google weather tomorrow", out shortTool, out shortArgs) || shortTool != "open_website" || shortArgs.Site != "google" || shortArgs.Search != "weather tomorrow" || Hands.Direct("look up it", out shortTool, out shortArgs)) throw new Exception("Her website or a quick Google search didn't skip the brain.");
@@ -5012,8 +5012,8 @@ namespace CapriDesktop
                             }
                             string sent;
                             lock (asked) sent = string.Join("\n", asked.ToArray());
-                            if (fetched.Length != tone.Length || sent.IndexOf("POST /v1/text-to-speech/abc?output_format=wav_24000", StringComparison.Ordinal) < 0 || sent.IndexOf("xi-api-key: sk_test_capri_1234", StringComparison.OrdinalIgnoreCase) < 0 || sent.IndexOf("{\"text\":\"Hi \\\"chewm\\\".\",\"model_id\":\"eleven_v3\"}", StringComparison.Ordinal) < 0) throw new Exception("ElevenLabs request was wrong: " + sent);
-                            if (Voice.Sayable("Yezzirrr! Choom, that's PREEM, chooms. Supreme.") != "Yessirrr! Chewm, that's PREME, chewms. Supreme." || Voice.Unsaid("Chewm, a preme rig. Supreme chewms.") != "Choom, a preem rig. Supreme chooms.") throw new Exception("Slang respelling is wrong: " + Voice.Sayable("Choom, that's PREEM, chooms. Supreme."));
+                            if (fetched.Length != tone.Length || sent.IndexOf("POST /v1/text-to-speech/abc?output_format=wav_24000", StringComparison.Ordinal) < 0 || sent.IndexOf("xi-api-key: sk_test_capri_1234", StringComparison.OrdinalIgnoreCase) < 0 || sent.IndexOf("{\"text\":\"Hi \\\"tchoum\\\".\",\"model_id\":\"eleven_v3\"}", StringComparison.Ordinal) < 0) throw new Exception("ElevenLabs request was wrong: " + sent);
+                            if (Voice.Sayable("Yezzirrr! Choom, that's PREEM, chooms. Supreme.") != "Yessirrr! Tchoum, that's PR\u00ceME, tchoums. Supreme." || Voice.Unsaid("Tchoum, un setup pr\u00eeme. Une prime, tchoums.") != "Choom, un setup preem. Une prime, chooms.") throw new Exception("Slang respelling is wrong: " + Voice.Sayable("Choom, that's PREEM, chooms. Supreme."));
                             VoicePage page = Voice.Read<VoicePage>(System.Text.Encoding.UTF8.GetBytes("{\"voices\":[{\"voice_id\":\"abc\",\"name\":\"Capri 1\",\"category\":\"generated\",\"labels\":{}},{\"voice_id\":\"def\",\"name\":\"Rachel\",\"category\":\"premade\"}],\"has_more\":false,\"total_count\":2,\"next_page_token\":null}"));
                             System.Collections.Generic.List<VoiceModel> listed = Voice.Read<System.Collections.Generic.List<VoiceModel>>(System.Text.Encoding.UTF8.GetBytes("[{\"model_id\":\"eleven_v3\",\"name\":\"Eleven v3\",\"can_do_text_to_speech\":true,\"languages\":[]}]"));
                             if (page.Voices.Count != 2 || page.More || page.Voices[0].Name != "Capri 1" || listed.Count != 1 || !listed[0].Speaks) throw new Exception("ElevenLabs listing did not parse.");
@@ -5471,7 +5471,7 @@ namespace CapriDesktop
                                             if (kind != null) { chunks++; lock (asked) asked.Add("chunk " + kind); }
                                         }
                                         send("{\"type\":\"user_transcript\",\"user_transcription_event\":{\"user_transcript\":\"hi\"}}");
-                                        send("{\"type\":\"agent_response\",\"agent_response_event\":{\"agent_response\":\"[GLITCH] Loud and clear, chewm.\"}}");
+                                        send("{\"type\":\"agent_response\",\"agent_response_event\":{\"agent_response\":\"[GLITCH] Loud and clear, tchoum.\"}}");
                                         send("{\"type\":\"audio\",\"audio_event\":{\"audio_base_64\":\"" + lineAudio + "\",\"event_id\":1,\"alignment\":{\"chars\":[\"L\"],\"char_durations_ms\":[40],\"char_start_times_ms\":[0]}}}");
                                         send("{\"type\":\"client_tool_call\",\"client_tool_call\":{\"tool_name\":\"open_app\",\"tool_call_id\":\"call_1\",\"parameters\":{\"name\":\"Spotify\"},\"event_id\":3,\"expects_response\":true}}");
                                         try
@@ -5547,7 +5547,7 @@ namespace CapriDesktop
                             if (heard != "hi" || reply != "Loud and clear, choom." || (talkState != TalkState.Talking && talkState != TalkState.Online) || !speaker.Busy) throw new Exception("Voice chat did not hear and answer: " + heard + " / " + reply + " / " + talkState + " / " + log);
                             Play(idle);
                             if (MouthCell(clock.Elapsed.TotalSeconds, idle) < 0) throw new Exception("Her mouth did not follow the agent's audio.");
-                            string[] wanted = { "http POST /v1/convai/agents/create sk_test_capri_1234 {\"name\":\"Capri\"", "\"turn\":{\"turn_timeout\":15,\"silence_end_call_timeout\":45}", "http PATCH /v1/convai/agents/agent_old sk_test_capri_1234 {\"conversation_config\":{\"turn\":{\"turn_timeout\":15,\"silence_end_call_timeout\":45},\"agent\":{\"prompt\":{\"prompt\":\"You are Capri", "\"tool_ids\":[\"tool_kept\",\"tool_1\",\"tool_2\",\"tool_3\",\"tool_4\",\"tool_5\",\"tool_6\"]", "\"tool_ids\":[\"tool_kept\",\"tool_7\",\"tool_8\",\"tool_9\",\"tool_10\",\"tool_11\",\"tool_12\"]}}}}", "\"name\":\"play_music\"", "\"name\":\"app_window\"", "\"name\":\"look_at_screen\"", "http GET /v1/convai/tools sk_test_capri_1234", "http POST /v1/convai/tools sk_test_capri_1234 {\"tool_config\":{\"type\":\"client\",\"name\":\"open_website\"", "\"name\":\"media\",\"description\":\"Control the music", "\"expects_response\":true,\"response_timeout_secs\":20}}", "You have tools for their PC", "tool {\"type\":\"client_tool_result\",\"tool_call_id\":\"call_1\",\"result\":\"Opened Spotify.\",\"is_error\":false}", "ran SpotifyAB.SpotifyMusic_zpdnekdrzrea0!Spotify", "check in once", "Don\u0027t beg them to talk", "\"prompt\":{\"prompt\":\"You are Capri", "\"llm\":\"gemini-2.5-flash\"", "\"tts\":{\"voice_id\":\"abc\"}", "\"overrides\":{\"conversation_config_override\":{\"agent\":{\"prompt\":{\"prompt\":true}},\"tts\":{\"voice_id\":true}}}", "http GET /v1/convai/conversation/get-signed-url?agent_id=agent_old sk_test_capri_1234", "init {\"type\":\"conversation_initiation_client_data\",\"conversation_config_override\":{\"agent\":{\"prompt\":{\"prompt\":\"You are Capri", "pong {\"type\":\"pong\",\"event_id\":7}", "chunk silent | chunk loud | chunk loud" };
+                            string[] wanted = { "http POST /v1/convai/agents/create sk_test_capri_1234 {\"name\":\"Capri\"", "\"turn\":{\"turn_timeout\":15,\"silence_end_call_timeout\":45}", "http PATCH /v1/convai/agents/agent_old sk_test_capri_1234 {\"conversation_config\":{\"turn\":{\"turn_timeout\":15,\"silence_end_call_timeout\":45},\"agent\":{\"prompt\":{\"prompt\":\"You are Capri", "\"tool_ids\":[\"tool_kept\",\"tool_1\",\"tool_2\",\"tool_3\",\"tool_4\",\"tool_5\",\"tool_6\"]", "\"tool_ids\":[\"tool_kept\",\"tool_7\",\"tool_8\",\"tool_9\",\"tool_10\",\"tool_11\",\"tool_12\"]},\"language\":\"fr\"},\"tts\":{\"model_id\":\"eleven_flash_v2_5\"}}}", "\"name\":\"play_music\"", "\"name\":\"app_window\"", "\"name\":\"look_at_screen\"", "http GET /v1/convai/tools sk_test_capri_1234", "http POST /v1/convai/tools sk_test_capri_1234 {\"tool_config\":{\"type\":\"client\",\"name\":\"open_website\"", "\"name\":\"media\",\"description\":\"Control the music", "\"expects_response\":true,\"response_timeout_secs\":20}}", "You have tools for their PC", "tool {\"type\":\"client_tool_result\",\"tool_call_id\":\"call_1\",\"result\":\"Opened Spotify.\",\"is_error\":false}", "ran SpotifyAB.SpotifyMusic_zpdnekdrzrea0!Spotify", "check in once", "Don\u0027t beg them to talk", "\"prompt\":{\"prompt\":\"You are Capri", "\"llm\":\"gemini-2.5-flash\"", "\"tts\":{\"voice_id\":\"abc\",\"model_id\":\"eleven_flash_v2_5\"}", "\"language\":\"fr\",\"prompt\":{\"prompt\":\"You are Capri", "\"overrides\":{\"conversation_config_override\":{\"agent\":{\"prompt\":{\"prompt\":true}},\"tts\":{\"voice_id\":true}}}", "http GET /v1/convai/conversation/get-signed-url?agent_id=agent_old sk_test_capri_1234", "init {\"type\":\"conversation_initiation_client_data\",\"conversation_config_override\":{\"agent\":{\"prompt\":{\"prompt\":\"You are Capri", "pong {\"type\":\"pong\",\"event_id\":7}", "chunk silent | chunk loud | chunk loud" };
                             foreach (string piece in wanted) if (log.IndexOf(piece, StringComparison.Ordinal) < 0) throw new Exception("Agent traffic was missing " + piece + ": " + log);
                             if (log.IndexOf("tool_stale", StringComparison.Ordinal) >= 0 || System.Text.RegularExpressions.Regex.Matches(log, "http POST /v1/convai/tools").Count != 12) throw new Exception("Voice chat reused a stale tool or remade a kept one: " + log);
                             Hands.Run = handsRun;
@@ -5705,9 +5705,9 @@ namespace CapriDesktop
                             if (transcribing) return;
                             string log;
                             lock (earsLog) log = string.Join(" | ", earsLog.ToArray());
-                            if (log != "think What's up, choom? | empty 15" || !local || earsShut || reply != "I couldn't make out any words. Try again closer to the mic." || mainframe.VoiceStatus.IndexOf("I couldn't make out any words.", StringComparison.Ordinal) != 0) throw new Exception("An empty transcript vanished or reached her brain: " + log);
+                            if (log != "think What's up, choom? | empty 15" || !local || earsShut || reply != "J'ai pas compris un seul mot. R\u00e9essaie plus pr\u00e8s du micro." || mainframe.VoiceStatus.IndexOf("J'ai pas compris un seul mot.", StringComparison.Ordinal) != 0) throw new Exception("An empty transcript vanished or reached her brain: " + log);
                             int notice = asking;
-                            Missed("I couldn't make out any words. Try again closer to the mic.", false);
+                            Missed("J'ai pas compris un seul mot. R\u00e9essaie plus pr\u00e8s du micro.", false);
                             if (asking != notice) throw new Exception("Repeated noise kept restarting her warning bubble.");
                             checks.Add("PASS empty transcription: a visible retry, no brain call, the mic stays open, and repeated warnings do not spam the bubble");
                             Hearing.Run = delegate(short[] samples) { throw new IOException("Test ears failure."); };
@@ -5717,7 +5717,7 @@ namespace CapriDesktop
                         else if (step == 12)
                         {
                             if (transcribing) return;
-                            if (!local || earsShut || reply != "I couldn't hear that. Try again, or check your mic under VOICE." || mainframe.VoiceStatus.IndexOf("Test ears failure.", StringComparison.Ordinal) != 0) throw new Exception("An offline hearing failure did not show a retry and keep free chat listening.");
+                            if (!local || earsShut || reply != "J'ai rien entendu. R\u00e9essaie, ou v\u00e9rifie ton micro sous VOICE." || mainframe.VoiceStatus.IndexOf("Test ears failure.", StringComparison.Ordinal) != 0) throw new Exception("An offline hearing failure did not show a retry and keep free chat listening.");
                             Hearing.Run = delegate(short[] samples) { return " Salut Capri, \u00e7a va ? "; };
                             Think = delegate(string words) { lock (earsLog) earsLog.Add("French " + words); return "Salut, choom."; };
                             foreach (short[] piece in earLine) ears.Feed(piece);

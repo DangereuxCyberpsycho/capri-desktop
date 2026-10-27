@@ -371,7 +371,8 @@ namespace CapriDesktop
         {
             List<RecognizerInfo> installed = new List<RecognizerInfo>(SpeechRecognitionEngine.InstalledRecognizers());
             List<string> cultures = installed.ConvertAll(delegate(RecognizerInfo info) { return info.Culture.Name; });
-            string chosen = Pick(cultures, CultureInfo.CurrentUICulture.Name);
+            string wanted = CultureInfo.CurrentUICulture.Name.StartsWith(Brain.Language, StringComparison.OrdinalIgnoreCase) ? CultureInfo.CurrentUICulture.Name : Brain.Language + "-FR";
+            string chosen = Pick(cultures, wanted);
             if (chosen == null) throw new IOException(NoRecognizer);
             SpeechRecognitionEngine made = new SpeechRecognitionEngine(installed[cultures.IndexOf(chosen)]);
             made.LoadGrammar(new DictationGrammar());

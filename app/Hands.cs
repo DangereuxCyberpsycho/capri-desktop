@@ -95,7 +95,7 @@ namespace CapriDesktop
         internal static readonly string Tools = Render(false);
         internal static readonly string ClaudeTools = Render(true);
         internal static readonly string Listing = Written();
-        private const string LookupWords = @"^(what('?s| is| are)|how('?s| is)|is it|will it|when('?s| is| does| do)|who won|did|check|get|tell me|show me|find)\b.*\b(weather|forecast|temperature|raining|snowing|news|headlines|scores?|stock price|price of|exchange rate|time (is it )?in|opening hours|open (today|now|tonight)|release date|showtimes|rain|snow|sunny|hot out|cold out)\b|^(weather|forecast|news|headlines)\b|^who (won|is winning)\b";
+        private const string LookupWords = @"^(what('?s| is| are)|how('?s| is)|is it|will it|when('?s| is| does| do)|who won|did|check|get|tell me|show me|find)\b.*\b(weather|forecast|temperature|raining|snowing|news|headlines|scores?|stock price|price of|exchange rate|time (is it )?in|opening hours|open (today|now|tonight)|release date|showtimes|rain|snow|sunny|hot out|cold out)\b|^(weather|forecast|news|headlines)\b|^who (won|is winning)\b|^(quel(le)?s?|quand|qui|c'est quoi|est-ce qu'il|il fait|il va|va-t-il|donne-moi|montre-moi|dis-moi|cherche)\b.*\b(m[ée]t[ée]o|pr[ée]visions?|temp[ée]rature|pleut|pleuvoir|neige|neiger|actus?|actualit[ée]s|infos|scores?|r[ée]sultats? du match|cours de|prix d[eu]|taux de change|heure (est-il |il est )?[àa]|horaires|ouvert (aujourd'hui|maintenant|ce soir)|date de sortie|s[ée]ances|pluie|soleil|chaud dehors|froid dehors)\b|^(m[ée]t[ée]o|actus?|actualit[ée]s|infos)\b|^qui (a gagn[ée]|gagne)\b";
 
         private static readonly Regex Asks = new Regex(
             @"^(open|launch|start|run|load up|boot up|fire up|play|shuffle|put on|blast|queue|close|quit|exit|kill|shut down|switch (back |over )?to|back to|go to|bring up|pull up|show me|minimi[sz]e|pause|unpause|resume|stop the music|skip|next|previous|go back|volume|louder|quieter|mute|unmute|search|google|look up|mind (opening|launching|playing|closing))\b" +
@@ -235,26 +235,26 @@ namespace CapriDesktop
             }
         }
 
-        private static readonly Regex Unknown = new Regex(@"\b(can'?t|cannot|can not|unable to|don'?t have|no way to|not able to)\b[^.!?]{0,40}\b(check|browse|look|search|google|access|know|tell|real[- ]?time|live|internet|web|online|current|up[- ]to[- ]date|forecast)\b|\b(i'?ll|i will|let me|lemme|i'?m (gonna|going to)|gonna|i gotta|i have to|i need to)\s+(\w+\s+){0,2}(search|google|look (it |that |this )?up|check)\b|\b(you('ll)? (might|may|will|would)? ?(need|want|have) to|maybe (you can|try)|you (gotta|got to|could|can|should)|try)\s+(\w+\s+){0,3}(look|check|search|google)\b|\bcheck (a|the|your) (\w+\s+){0,2}(weather|news|app|site|feed|forecast|website)\b|\bcrystal ball\b", RegexOptions.IgnoreCase);
-        private static readonly Regex Question = new Regex(@"\?\s*$|^(what|what's|whats|how|how's|when|where|who|which|why|is|are|was|were|will|does|do|did|can|could|would|tell me|check|look up|google|search|any idea)\b", RegexOptions.IgnoreCase);
+        private static readonly Regex Unknown = new Regex(@"\b(can'?t|cannot|can not|unable to|don'?t have|no way to|not able to)\b[^.!?]{0,40}\b(check|browse|look|search|google|access|know|tell|real[- ]?time|live|internet|web|online|current|up[- ]to[- ]date|forecast)\b|\b(i'?ll|i will|let me|lemme|i'?m (gonna|going to)|gonna|i gotta|i have to|i need to)\s+(\w+\s+){0,2}(search|google|look (it |that |this )?up|check)\b|\b(you('ll)? (might|may|will|would)? ?(need|want|have) to|maybe (you can|try)|you (gotta|got to|could|can|should)|try)\s+(\w+\s+){0,3}(look|check|search|google)\b|\bcheck (a|the|your) (\w+\s+){0,2}(weather|news|app|site|feed|forecast|website)\b|\bcrystal ball\b|\b(je (ne )?peux pas|j'peux pas|impossible de|je n'ai pas|j'ai pas|aucun moyen de)\b[^.!?]{0,40}\b(v[ée]rifier|chercher|regarder|acc[ée]der|savoir|dire|internet|web|en ligne|en direct|temps r[ée]el|actuel\w*|[àa] jour|pr[ée]visions?|m[ée]t[ée]o)\b|\b(je vais|laisse-moi|je dois)\s+(\w+\s+){0,2}(chercher|googler|v[ée]rifier|regarder)\b|\b(tu (devrais|peux|pourrais|dois)|essaie de)\s+(\w+\s+){0,3}(chercher|v[ée]rifier|regarder|googler)\b|\bboule de cristal\b", RegexOptions.IgnoreCase);
+        private static readonly Regex Question = new Regex(@"\?\s*$|^(what|what's|whats|how|how's|when|where|who|which|why|is|are|was|were|will|does|do|did|can|could|would|tell me|check|look up|google|search|any idea|quoi|qu'est-ce|quel(le)?s?|comment|quand|o[uù]|qui|pourquoi|combien|est-ce que|c'est quoi|dis-moi|tu sais|cherche)\b", RegexOptions.IgnoreCase);
 
         internal static ToolArguments Lookup(string said, string reply)
         {
             string text = Asked(said);
-            string plain = Regex.Replace(text, @"^(do|did) (you|u) (know|have any idea)\b|\byou know\b|^(tell|show|get|find) me\b|\b(near me|where i (am|live)|in my (area|city|town|suburb))\b", "", RegexOptions.IgnoreCase);
-            if (text.Length < 4 || !Question.IsMatch((said ?? "").Trim()) || !Unknown.IsMatch((reply ?? "").Replace('’', '\'')) || Regex.IsMatch(plain, @"\b(screen|song|playing|track|you|your|yourself|u|ur|capri|me|my|i|i'm|im)\b", RegexOptions.IgnoreCase) || Regex.IsMatch(reply ?? "", @"\bscreen\b", RegexOptions.IgnoreCase) || Safety.Screen(text) != null) return null;
+            string plain = Regex.Replace(text, @"^(do|did) (you|u) (know|have any idea)\b|\byou know\b|^(tell|show|get|find) me\b|\b(near me|where i (am|live)|in my (area|city|town|suburb))\b|^(est-ce que )?tu sais\b|^sais-tu\b|^(dis|montre|trouve)-moi\b|\b((pr[èe]s de )?chez moi|o[uù] j'habite|dans (ma|mon) (ville|coin|quartier|r[ée]gion))\b", "", RegexOptions.IgnoreCase);
+            if (text.Length < 4 || !Question.IsMatch((said ?? "").Trim()) || !Unknown.IsMatch((reply ?? "").Replace('’', '\'')) || Regex.IsMatch(plain, @"\b(screen|song|playing|track|you|your|yourself|u|ur|capri|me|my|i|i'm|im|[ée]cran|chanson|musique|toi|tu|te|ton|ta|tes|moi|mon|ma|mes|je)\b", RegexOptions.IgnoreCase) || Regex.IsMatch(reply ?? "", @"\bscreen\b|[ée]cran", RegexOptions.IgnoreCase) || Safety.Screen(text) != null) return null;
             return new ToolArguments { Site = "google", Search = text };
         }
 
         internal static string Pulled(string result)
         {
-            if ((result ?? "").StartsWith("Opened your own website", StringComparison.Ordinal)) return "Here's my site, choom. That's where people download me.";
+            if ((result ?? "").StartsWith("Opened your own website", StringComparison.Ordinal)) return "Voilà mon site, choom. C'est là qu'on me télécharge.";
             Match searched = Regex.Match(result ?? "", @"^Searched google\.com for (.+)\.$");
-            return searched.Success ? "Pulled up \"" + searched.Groups[1].Value + "\" on Google for you, choom." : null;
+            return searched.Success ? "J'ai cherché \"" + searched.Groups[1].Value + "\" sur Google pour toi, choom." : null;
         }
 
-        internal const string Unpromised = "I haven't done that yet, choom. Tell me what to open or click and I'm on it.";
-        private static readonly Regex Promise = new Regex(@"\b(i'?ll|i will|let me|lemme|i'?m (gonna|going to|about to)|gonna|on it,?)\s+(\w+\s+){0,2}(open|launch|load|boot|fire|pull|bring|search|google|look up|click|type|close|switch|head|install|download|play(?!\s+(along|around|with|nice|fair|dumb|it (cool|safe)|((a|some|the|this|that|any|your|my)\s+)?(games?|round|match)\b|devil))|put on|queue|blast|spin)\b|^((sure|ok|okay|alright|bet|got it|on it|say less|yessir+|yezzir+)[,.!\s]+)?(opening|launching|loading|pulling up|bringing up|firing up|booting up|heading to|searching|clicking|typing|closing|switching|playing|putting on|queuing|queueing|blasting|spinning)\b", RegexOptions.IgnoreCase);
+        internal const string Unpromised = "Je ne l'ai pas encore fait, choom. Dis-moi quoi ouvrir ou sur quoi cliquer et je m'en occupe.";
+        private static readonly Regex Promise = new Regex(@"\b(i'?ll|i will|let me|lemme|i'?m (gonna|going to|about to)|gonna|on it,?)\s+(\w+\s+){0,2}(open|launch|load|boot|fire|pull|bring|search|google|look up|click|type|close|switch|head|install|download|play(?!\s+(along|around|with|nice|fair|dumb|it (cool|safe)|((a|some|the|this|that|any|your|my)\s+)?(games?|round|match)\b|devil))|put on|queue|blast|spin)\b|^((sure|ok|okay|alright|bet|got it|on it|say less|yessir+|yezzir+)[,.!\s]+)?(opening|launching|loading|pulling up|bringing up|firing up|booting up|heading to|searching|clicking|typing|closing|switching|playing|putting on|queuing|queueing|blasting|spinning)\b|\b(je vais|j'vais|laisse-moi|je m'en occupe,?)\s+(\w+\s+){0,2}(l'|t'|les |la |le )?(ouvrir|lancer|charger|chercher|googler|cliquer|taper|fermer|mettre|passer|t[ée]l[ée]charger|installer|jouer(?!\s+(avec|[àa]|aux|un|une|le jeu|au)\b))\b|^((ok|okay|d'accord|[çc]a marche|carr[ée]ment|yessir+|yezzir+)[,.!\s]+)?(j'ouvre|je lance|je mets|je cherche|je ferme|je clique|je tape|je passe|c'est parti pour)\b", RegexOptions.IgnoreCase);
 
         internal static bool Promised(string said) { return Promise.IsMatch((said ?? "").Replace('’', '\'')); }
 
@@ -329,7 +329,7 @@ namespace CapriDesktop
             }
             found = Regex.Match(text, @"^(?:google|look up)\s+(.+)$", RegexOptions.IgnoreCase);
             if (found.Success && !Regex.IsMatch(found.Groups[1].Value, @"^(it|this|that|something|stuff|for me)$", RegexOptions.IgnoreCase)) { tool = "open_website"; args.Site = "google"; args.Search = found.Groups[1].Value.Trim(); return true; }
-            if (Regex.IsMatch(text, LookupWords, RegexOptions.IgnoreCase) && !Regex.IsMatch(Regex.Replace(text, @"\bnear me\b", ""), @"\b(my|your|you|me|i)\b", RegexOptions.IgnoreCase) && Safety.Screen(text) == null) { tool = "open_website"; args.Site = "google"; args.Search = text; return true; }
+            if (Regex.IsMatch(text, LookupWords, RegexOptions.IgnoreCase) && !Regex.IsMatch(Regex.Replace(text, @"\bnear me\b|\b(pr[èe]s de )?chez moi\b", "", RegexOptions.IgnoreCase), @"\b(my|your|you|me|i|mon|ma|mes|moi|tu|ton|ta|tes|toi|je)\b", RegexOptions.IgnoreCase) && Safety.Screen(text) == null) { tool = "open_website"; args.Site = "google"; args.Search = text; return true; }
             found = Regex.Match(text, @"^(?:play|shuffle|put on|blast)\s+(.+?)(\s+on\s+(spotify|youtube))?$", RegexOptions.IgnoreCase);
             if (found.Success)
             {
@@ -825,7 +825,7 @@ namespace CapriDesktop
             ServicePointManager.SecurityProtocol |= (SecurityProtocolType)3072;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(address);
             request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
-            request.Headers["Accept-Language"] = "en";
+            request.Headers["Accept-Language"] = "fr-FR,fr;q=0.9,en;q=0.6";
             request.Timeout = 8000;
             request.ReadWriteTimeout = 8000;
             try

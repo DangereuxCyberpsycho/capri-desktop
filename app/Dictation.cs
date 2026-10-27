@@ -40,11 +40,24 @@ namespace CapriDesktop
         private bool opened;
         private DateTime began;
 
+        private static SpeechRecognizer Recognizer()
+        {
+            try
+            {
+                Windows.Globalization.Language system = SpeechRecognizer.SystemSpeechLanguage;
+                if (system != null && system.LanguageTag.StartsWith(Brain.Language, StringComparison.OrdinalIgnoreCase)) return new SpeechRecognizer(system);
+                foreach (Windows.Globalization.Language language in SpeechRecognizer.SupportedTopicLanguages)
+                    if (language.LanguageTag.StartsWith(Brain.Language, StringComparison.OrdinalIgnoreCase)) return new SpeechRecognizer(language);
+            }
+            catch (Exception) { }
+            return new SpeechRecognizer();
+        }
+
         internal static string Probe()
         {
             try
             {
-                using (SpeechRecognizer made = new SpeechRecognizer())
+                using (SpeechRecognizer made = Recognizer())
                 {
                     made.Constraints.Add(new SpeechRecognitionTopicConstraint(SpeechRecognitionScenario.Dictation, "dictation"));
                     SpeechRecognitionCompilationResult compiled = made.CompileConstraintsAsync().AsTask().Result;
@@ -67,7 +80,7 @@ namespace CapriDesktop
 
         private void Open()
         {
-            SpeechRecognizer made = new SpeechRecognizer();
+            SpeechRecognizer made = Recognizer();
             lock (gate)
             {
                 if (closed) { made.Dispose(); throw new ObjectDisposedException("Dictation"); }
