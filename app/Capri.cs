@@ -5234,7 +5234,7 @@ namespace CapriDesktop
                                 return;
                             }
                             if (mouths == null) { if (clock.Elapsed.TotalSeconds > voiceDeadline) throw new Exception("Late audio never reached her."); return; }
-                            if (voiced != "Liaison vocale en ligne. Je t'ai manqu\u00e9, choom ?") throw new Exception("Voice was sent the wrong words: " + voiced);
+                            if (voiced != "Voice link online. Miss me, choom?") throw new Exception("Voice was sent the wrong words: " + voiced);
                             if ((talkState != TalkState.Talking && talkState != TalkState.Online) || reply != line || mouths == null || mouths.Length != 12 || pace != LettersPerSecond || replyStart != textAt) throw new Exception("Voice hid or restarted the text reply: " + talkState + " " + pace);
                             voiceReady.Dispose();
                             double now = clock.Elapsed.TotalSeconds;
