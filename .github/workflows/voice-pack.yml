@@ -1,0 +1,24 @@
+name: Voice pack
+
+# Copies her free voice (capri-voice-1.zip) from lachydotmcg/capri-desktop into a release of this repo,
+# so this version doesn't depend on the original. Run it once by hand (Actions > Voice pack > Run workflow).
+on:
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Copy
+        run: |
+          if gh release view voice-pack-1 >/dev/null 2>&1; then echo "Already here"; exit 0; fi
+          sha=$(sed -n 's/.*Sha = "\([0-9a-f]*\)".*/\1/p' app/VoicePack.cs)
+          curl -fL --retry 3 -o capri-voice-1.zip https://github.com/lachydotmcg/capri-desktop/releases/download/voice-pack-1/capri-voice-1.zip
+          echo "$sha  capri-voice-1.zip" | sha256sum -c -
+          gh release create voice-pack-1 capri-voice-1.zip --prerelease --title "Capri voice pack 1" --notes "Her free voice, copied from lachydotmcg/capri-desktop. Not an app version."

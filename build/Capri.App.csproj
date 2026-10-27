@@ -21,6 +21,7 @@
     <EmbeddedResource Include="../assets/chip.ico" LogicalName="Capri.Chip.ico" />
     <EmbeddedResource Include="../assets/chip.png" LogicalName="Capri.Chip.png" />
     <EmbeddedResource Include="../assets/fonts/ShareTechMono-Regular.ttf" LogicalName="Capri.Font.Mono.ttf" />
+    <EmbeddedResource Include="../assets/voice/*.wav" LogicalName="Capri.Voice.%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />

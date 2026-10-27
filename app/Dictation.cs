@@ -12,12 +12,23 @@ namespace CapriDesktop
         internal const string MicBlocked = "Windows is blocking the mic. Turn on Let desktop apps access your microphone in Settings > Privacy & security > Microphone.";
         internal const string NoMic = "Windows can't find a mic. Plug one in, or pick one in Settings > System > Sound.";
         internal static Func<Dictation> Make = delegate { return new WindowsDictation(); };
+        internal static Func<string> DefaultMic = delegate
+        {
+            try { return Windows.Media.Devices.MediaDevice.GetDefaultAudioCaptureId(Windows.Media.Devices.AudioDeviceRole.Default); }
+            catch (Exception) { return null; }
+        };
         internal Action<string> Heard;
         internal Action<string> Lost;
 
         internal abstract void Start(Action<string> started);
         internal abstract void Hold(bool held);
         public abstract void Dispose();
+
+        internal static string OtherMic(string chosen, string name, string defaultId)
+        {
+            if (string.IsNullOrEmpty(chosen) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(defaultId) || defaultId.IndexOf(chosen, StringComparison.OrdinalIgnoreCase) >= 0) return null;
+            return "Windows speech only hears your default mic, not " + name + ". Make " + name + " the default in Windows Settings > System > Sound > Input, or pick Mic: default here.";
+        }
 
         internal static string Explain(Exception error)
         {
@@ -39,15 +50,16 @@ namespace CapriDesktop
         private bool busy;
         private bool opened;
         private DateTime began;
+        private int quick;
 
         private static SpeechRecognizer Recognizer()
         {
             try
             {
                 Windows.Globalization.Language system = SpeechRecognizer.SystemSpeechLanguage;
-                if (system != null && system.LanguageTag.StartsWith(Brain.Language, StringComparison.OrdinalIgnoreCase)) return new SpeechRecognizer(system);
+                if (system != null && system.LanguageTag.StartsWith(Brain.LanguageCode(Brain.Language), StringComparison.OrdinalIgnoreCase)) return new SpeechRecognizer(system);
                 foreach (Windows.Globalization.Language language in SpeechRecognizer.SupportedTopicLanguages)
-                    if (language.LanguageTag.StartsWith(Brain.Language, StringComparison.OrdinalIgnoreCase)) return new SpeechRecognizer(language);
+                    if (language.LanguageTag.StartsWith(Brain.LanguageCode(Brain.Language), StringComparison.OrdinalIgnoreCase)) return new SpeechRecognizer(language);
             }
             catch (Exception) { }
             return new SpeechRecognizer();
@@ -154,15 +166,18 @@ namespace CapriDesktop
         private void Ended(SpeechContinuousRecognitionSession session, SpeechContinuousRecognitionCompletedEventArgs args)
         {
             SpeechRecognitionResultStatus status = args.Status;
+            bool fatal = status == SpeechRecognitionResultStatus.MicrophoneUnavailable || status == SpeechRecognitionResultStatus.TopicLanguageNotSupported || status == SpeechRecognitionResultStatus.GrammarLanguageMismatch || status == SpeechRecognitionResultStatus.GrammarCompilationFailure;
             lock (gate)
             {
                 if (closed || !running) return;
                 running = false;
-                if ((status == SpeechRecognitionResultStatus.TimeoutExceeded || status == SpeechRecognitionResultStatus.Success) && DateTime.UtcNow - began > TimeSpan.FromSeconds(5))
+                quick = DateTime.UtcNow - began < TimeSpan.FromSeconds(5) ? quick + 1 : 0;
+                if (!fatal && quick < 3)
                 {
                     if (busy) return;
                     busy = true;
-                    ThreadPool.QueueUserWorkItem(delegate { Settle(); });
+                    bool pause = quick > 0;
+                    ThreadPool.QueueUserWorkItem(delegate { if (pause) Thread.Sleep(700); Settle(); });
                     return;
                 }
             }
