@@ -80,6 +80,7 @@ namespace CapriDesktop
         [DataMember] public bool Quiet;
         [DataMember] public bool Wander;
         [DataMember] public bool FreeVoice;
+        [DataMember] public bool StartupSet;
     }
 
     [DataContract]
@@ -526,8 +527,12 @@ namespace CapriDesktop
         private const int DismountId = 0x4361;
         private const int TalkKeyId = 0x4356;
         private const int MuteKeyId = 0x434D;
+        private const int TypeKeyId = 0x4354;
+        private const string RunKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
         private bool talkKey;
         private bool muteKey;
+        private bool typeKey;
+        private ToolStripMenuItem startupItem;
         private const int BlinkFrom = 9;
         internal bool TestFailed;
 
@@ -587,6 +592,9 @@ namespace CapriDesktop
             moves.DropDownItems.Add(hangHereItem);
             moves.DropDownItems.Add(new ToolStripMenuItem("Bring to this screen", null, delegate { RestoreAtCursor(); }));
             menu.Items.Add(moves);
+            startupItem = new ToolStripMenuItem("Start with Windows", null, delegate { try { SetStartup(!StartsWithWindows()); } catch (Exception) { } });
+            menu.Items.Add(startupItem);
+            menu.Opening += delegate { startupItem.Text = testing ? "Start with Windows" : StartsWithWindows() ? "Start with Windows: On" : "Start with Windows: Off"; };
             menu.Opening += delegate { sitHereItem.Text = seat != null && seat.Free ? "Stand up" : "Sit here"; hangHereItem.Text = hanging ? "Let go" : "Hang here"; };
             clickDelay = new System.Windows.Forms.Timer();
             clickDelay.Interval = Math.Max(100, SystemInformation.DoubleClickTime);
@@ -705,6 +713,8 @@ namespace CapriDesktop
             if (!testing) FindBrain();
             if (!testing && voice.Key != null) ListVoices(voice.Key, false);
             if (!testing) talkKey = Native.RegisterHotKey(Handle, TalkKeyId, 0x0001 | 0x0002 | 0x4000, 0x56);
+            if (!testing) typeKey = Native.RegisterHotKey(Handle, TypeKeyId, 0x0001 | 0x0002 | 0x4000, 0x20);
+            if (!testing) FirstStartup();
             bool muteFree = !testing && Native.RegisterHotKey(Handle, MuteKeyId, 0x0001 | 0x0002 | 0x4000, 0x4E) && Native.UnregisterHotKey(Handle, MuteKeyId);
             mainframe.ShowShortcut(talkKey, muteFree);
             RefreshIcons();
@@ -1038,6 +1048,7 @@ namespace CapriDesktop
             if (message.Msg == 0x0312 && message.WParam.ToInt32() == DismountId) { StopRide(); return; }
             if (message.Msg == 0x0312 && message.WParam.ToInt32() == TalkKeyId) { if (hidden) SetHidden(false); ToggleChat(); return; }
             if (message.Msg == 0x0312 && message.WParam.ToInt32() == MuteKeyId) { ToggleMic(); return; }
+            if (message.Msg == 0x0312 && message.WParam.ToInt32() == TypeKeyId) { if (hidden) SetHidden(false); OpenTyper(); return; }
             if (message.Msg == 0x02E0) { anchor = KeepOnScreen(anchor); Location = anchor; RenderFrame(); }
             base.WndProc(ref message);
         }
@@ -2165,6 +2176,30 @@ namespace CapriDesktop
             pill.Place(new Point(feet.X - (int)(4 * s), top), s);
         }
 
+        internal static bool StartsWithWindows()
+        {
+            using (Microsoft.Win32.RegistryKey run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RunKey)) return run != null && run.GetValue("Capri") != null;
+        }
+
+        private static void SetStartup(bool on)
+        {
+            using (Microsoft.Win32.RegistryKey run = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RunKey))
+            {
+                if (on) run.SetValue("Capri", "\"" + Application.ExecutablePath + "\"");
+                else run.DeleteValue("Capri", false);
+            }
+        }
+
+        private void FirstStartup()
+        {
+            if (preferences.StartupSet) return;
+            string installed = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Capri");
+            if (!string.Equals(Path.GetDirectoryName(Application.ExecutablePath), installed, StringComparison.OrdinalIgnoreCase)) return;
+            try { SetStartup(true); } catch (Exception) { return; }
+            preferences.StartupSet = true;
+            SavePreferences();
+        }
+
         private void OpenTyper()
         {
             if (typer.Visible) { typer.Hide(); return; }
@@ -2983,6 +3018,8 @@ namespace CapriDesktop
             StopChat();
             if (talkKey) Native.UnregisterHotKey(Handle, TalkKeyId);
             talkKey = false;
+            if (typeKey) Native.UnregisterHotKey(Handle, TypeKeyId);
+            typeKey = false;
             speaker.Close();
             voice.Stop();
             engine.Cancel = true;

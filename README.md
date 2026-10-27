@@ -96,6 +96,8 @@ Just ask her for things, like "open Spotify", "play Blinding Lights", "pause", "
 | Ctrl + Alt + V | start or stop voice chat |
 | Ctrl + Alt + N | mute your mic |
 | Ctrl + Alt + C | get her off your cursor |
+| Ctrl + Alt + Space | type to her from anywhere |
+| Right-click, Start with Windows | she opens when you sign in (on by default once installed) |
 | Right-click, Move | she hops between your open windows |
 | Watch my screen | in the Mainframe: she comments as you play |
 | Speak replies | in the Mainframe: turn off to save ElevenLabs credits |
