@@ -18,6 +18,7 @@
   <ItemGroup>
     <Compile Include="../app/Setup.cs" />
     <Compile Include="../app/AssemblyInfo.cs" />
+    <Compile Include="../app/VoicePack.cs" />
     <EmbeddedResource Include="$(AppExe)" LogicalName="Capri.App.exe" />
     <EmbeddedResource Include="../assets/chip.ico" LogicalName="Capri.Chip.ico" />
     <EmbeddedResource Include="../assets/chip.png" LogicalName="Capri.Chip.png" />

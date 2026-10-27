@@ -12,54 +12,41 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 10.0.x
-      - name: Build
-        shell: pwsh
-        run: |
-          dotnet build build/Capri.App.csproj -c Release -o build/out
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          dotnet build build/Capri.Setup.csproj -c Release -o build/setup-out
-          if ($LASTEXITCODE -ne 0) { exit 1 }
       - name: Screen like a real PC
         shell: pwsh
         run: |
           try { Set-DisplayResolution -Width 1920 -Height 1080 -Force } catch { Write-Host "::warning::Could not set the resolution: $_" }
           Add-Type -AssemblyName System.Windows.Forms
           Write-Host "::notice title=Screen::$([System.Windows.Forms.Screen]::PrimaryScreen.Bounds)"
-      - name: Smoke test
+      - name: Build and smoke test
         shell: pwsh
-        timeout-minutes: 15
+        run: ./ci/build-windows.ps1 -OutputDirectory out/windows -SmokeTest -SmokeSeconds 300
+      - name: Smoke test results
+        if: always()
+        shell: pwsh
         run: |
-          $smoke = Join-Path $PWD "smoke"
-          $run = Start-Process -FilePath build/out/Capri.exe -ArgumentList "--smoke-test", "`"$smoke`"" -PassThru -Wait
-          $failed = $run.ExitCode -ne 0
+          $smoke = "out/windows/smoke/runtime"
           if (Test-Path "$smoke/smoke-test.txt") {
             $lines = Get-Content "$smoke/smoke-test.txt"
-            $lines
             $passes = @($lines | Where-Object { $_ -like 'PASS*' }).Count
             Write-Host "::notice title=Smoke test::$passes PASS"
-            foreach ($line in $lines | Where-Object { $_ -like 'FAIL*' }) { Write-Host "::error title=Smoke test::$line"; $failed = $true }
-          } else { Write-Host "::error title=Smoke test::No smoke-test.txt"; $failed = $true }
-          if (Test-Path "$smoke/failure.txt") {
-            $crash = (Get-Content "$smoke/failure.txt" -Raw) -replace '%', '%25' -replace "`r", '' -replace "`n", '%0A'
-            Write-Host "::error title=Smoke test crash::$crash"
-            $failed = $true
+            foreach ($line in $lines | Where-Object { $_ -like 'FAIL*' }) { Write-Host "::error title=Smoke test::$line" }
+          } else { Write-Host "::error title=Smoke test::No smoke-test.txt" }
+          foreach ($crash in @("$smoke/failure.txt", "out/windows/smoke/package/failure.txt")) {
+            if (Test-Path $crash) { Write-Host "::error title=Smoke test crash::$((Get-Content $crash -Raw) -replace '%', '%25' -replace "`r", '' -replace "`n", '%0A')" }
           }
-          if ($failed) { Write-Host "::error title=Smoke test::Capri exited with $($run.ExitCode)"; exit 1 }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: smoke-test
-          path: smoke/
+          path: out/windows/smoke/
           if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         with:
           name: Capri-windows
           path: |
-            build/out/Capri.exe
-            build/setup-out/Capri-Setup.exe
+            out/windows/Capri.exe
+            out/windows/Capri-Setup.exe
 
   release:
     # Publie une version quand main reçoit un numéro de version qui n'a pas encore de release.
@@ -78,7 +65,7 @@ jobs:
         id: version
         run: |
           full=$(sed -n 's/.*AssemblyVersion("\([0-9.]*\)").*/\1/p' app/AssemblyInfo.cs)
-          version=${full%.0}
+          version=$(echo "$full" | cut -d. -f1-3)
           echo "tag=v$version" >> "$GITHUB_OUTPUT"
           if gh release view "v$version" >/dev/null 2>&1; then echo "new=false" >> "$GITHUB_OUTPUT"; else echo "new=true" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/download-artifact@v5
@@ -90,6 +77,6 @@ jobs:
         if: steps.version.outputs.new == 'true'
         run: |
           mkdir release
-          cp dist/setup-out/Capri-Setup.exe dist/out/Capri.exe release/
+          cp dist/Capri-Setup.exe dist/Capri.exe release/
           (cd release && sha256sum Capri-Setup.exe Capri.exe > SHA256SUMS.txt)
           gh release create "${{ steps.version.outputs.tag }}" release/* --target "$GITHUB_SHA" --title "Capri ${{ steps.version.outputs.tag }}" --generate-notes
