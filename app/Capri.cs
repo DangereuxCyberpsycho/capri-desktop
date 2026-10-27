@@ -81,6 +81,7 @@ namespace CapriDesktop
         [DataMember] public bool Wander;
         [DataMember] public bool FreeVoice;
         [DataMember] public bool StartupSet;
+        [DataMember] public bool NoWake;
     }
 
     [DataContract]
@@ -533,6 +534,9 @@ namespace CapriDesktop
         private bool muteKey;
         private bool typeKey;
         private ToolStripMenuItem startupItem;
+        private ToolStripMenuItem wakeItem;
+        private readonly WakeWord heyCapri = new WakeWord();
+        private volatile string wakeProblem;
         private const int BlinkFrom = 9;
         internal bool TestFailed;
 
@@ -594,6 +598,9 @@ namespace CapriDesktop
             menu.Items.Add(moves);
             startupItem = new ToolStripMenuItem("Start with Windows", null, delegate { try { SetStartup(!StartsWithWindows()); } catch (Exception) { } });
             menu.Items.Add(startupItem);
+            wakeItem = new ToolStripMenuItem("Hey Capri", null, delegate { ToggleWake(); });
+            menu.Items.Add(wakeItem);
+            menu.Opening += delegate { wakeItem.Text = testing ? "Hey Capri" : preferences.NoWake ? "Hey Capri: Off" : wakeProblem != null ? "Hey Capri: needs a speech pack" : "Hey Capri: On"; wakeItem.ToolTipText = preferences.NoWake ? null : wakeProblem; };
             menu.Opening += delegate { startupItem.Text = testing ? "Start with Windows" : StartsWithWindows() ? "Start with Windows: On" : "Start with Windows: Off"; };
             menu.Opening += delegate { sitHereItem.Text = seat != null && seat.Free ? "Stand up" : "Sit here"; hangHereItem.Text = hanging ? "Let go" : "Hang here"; };
             clickDelay = new System.Windows.Forms.Timer();
@@ -715,6 +722,8 @@ namespace CapriDesktop
             if (!testing) talkKey = Native.RegisterHotKey(Handle, TalkKeyId, 0x0001 | 0x0002 | 0x4000, 0x56);
             if (!testing) typeKey = Native.RegisterHotKey(Handle, TypeKeyId, 0x0001 | 0x0002 | 0x4000, 0x20);
             if (!testing) FirstStartup();
+            heyCapri.Called += delegate(string request) { Post(delegate { Called(request); }); };
+            StartWake();
             bool muteFree = !testing && Native.RegisterHotKey(Handle, MuteKeyId, 0x0001 | 0x0002 | 0x4000, 0x4E) && Native.UnregisterHotKey(Handle, MuteKeyId);
             mainframe.ShowShortcut(talkKey, muteFree);
             RefreshIcons();
@@ -2200,6 +2209,33 @@ namespace CapriDesktop
             SavePreferences();
         }
 
+        private void StartWake()
+        {
+            if (testing || preferences.NoWake) return;
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                try { heyCapri.Start(); wakeProblem = null; }
+                catch (Exception error) { wakeProblem = error.Message; }
+            });
+        }
+
+        private void ToggleWake()
+        {
+            preferences.NoWake = !preferences.NoWake;
+            SavePreferences();
+            if (preferences.NoWake) heyCapri.Stop(); else StartWake();
+        }
+
+        // "Hé Capri" on its own opens a voice chat, or the typing box without a voice; "Hé Capri, ouvre Spotify" asks straight away.
+        private void Called(string request)
+        {
+            if (testing || chatting || speaker.Busy) return;
+            if (hidden) SetHidden(false);
+            if (request.Length > 0) { Hear(request); return; }
+            if (FreeChatOn || (voice.Key != null && voice.VoiceId != null)) ToggleChat();
+            else if (!typer.Visible) OpenTyper();
+        }
+
         private void OpenTyper()
         {
             if (typer.Visible) { typer.Hide(); return; }
@@ -3020,6 +3056,7 @@ namespace CapriDesktop
             talkKey = false;
             if (typeKey) Native.UnregisterHotKey(Handle, TypeKeyId);
             typeKey = false;
+            heyCapri.Dispose();
             speaker.Close();
             voice.Stop();
             engine.Cancel = true;
@@ -3593,7 +3630,7 @@ namespace CapriDesktop
                             checks.Add("PASS size menu");
                             string[] tops = new string[menu.Items.Count];
                             for (int i = 0; i < tops.Length; i++) tops[i] = menu.Items[i].Text;
-                            if (string.Join(",", tops) != "CAPRI  /  " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3) + ",,Open Capri Mainframe,Hide Capri,Size,Move,Start with Windows,Help,,Quit Capri") throw new Exception("The right-click menu is not the short one: " + string.Join(",", tops));
+                            if (string.Join(",", tops) != "CAPRI  /  " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3) + ",,Open Capri Mainframe,Hide Capri,Size,Move,Start with Windows,Hey Capri,Help,,Quit Capri") throw new Exception("The right-click menu is not the short one: " + string.Join(",", tops));
                             ToggleMotion();
                             if (frames.Enabled) throw new Exception("Motion toggle did not stop idle timer.");
                             checks.Add("PASS motion pause");
@@ -3847,6 +3884,7 @@ namespace CapriDesktop
                                 if (!Hands.Wants("click the search bar") || !Hands.Wants("make a song in suno") || Hands.Wants("make a joke") || !Hands.Promised("Opening Comet now, choom!") || !Hands.Promised("Bet, I'll open it for you.") || Hands.Promised("I'll play a game with you anytime.") || Hands.Promised("Sure, I love that song.")) throw new Exception("Computer jobs or false promises were spotted wrong.");
                                 ToolArguments lookedUp = Hands.Lookup("when does the new GTA come out?", "I don't have live info on that, choom.");
                                 if (!Hands.Wants("what's the weather in sydney?") || !Hands.Wants("can you check the weather") || !Hands.Wants("who won the game last night") || Hands.Wants("i love rainy weather") || lookedUp == null || lookedUp.Site != "google" || lookedUp.Search != "when does the new GTA come out" || Hands.Lookup("what's the weather near me?", "I'll look it up for you, choom!") == null || Hands.Lookup("what's my name?", "I don't have a way to know your name.") != null || Hands.Lookup("how are you?", "Can't complain, choom.") != null || Hands.Lookup("what do you see?", "I can't see your screen right now.") != null || Hands.Lookup("what's the capital of france?", "Paris, choom.") != null || !Hands.Wants("is it gonna rain tomorrow?") || Hands.Lookup("when does gta 6 come out?", "I gotta check that for you, choom. You might need to look that up somewhere else.") == null || Hands.Lookup("is it hot in perth?", "Check a proper weather feed, choom; I ain't got crystal ball optics.") == null || Hands.Lookup("when's the next gta out?", "You gotta check a search engine for that, choom.") == null || Hands.Pulled("Searched google.com for weather in sydney.") != "J'ai cherché \"weather in sydney\" sur Google pour toi, choom." || Hands.Pulled("Searched youtube.com for lofi beats.") != null || Hands.Pulled("Opened your own website, " + Hands.Home + ".") != "Voilà mon site, choom. C'est là qu'on me télécharge.") throw new Exception("Look-ups that need Google were spotted wrong.");
+                                if (Hands.Called("H\u00e9 Capri") != "" || Hands.Called("eh Capri, ouvre Spotify.") != "ouvre Spotify" || Hands.Called("hey capri!") != "" || Hands.Called("j'ai visit\u00e9 Capri cet \u00e9t\u00e9") != null || Hands.Called("hey caprice") != null) throw new Exception("Hey Capri was heard wrong.");
                                 string shortTool;
                                 ToolArguments shortArgs;
                                 if (!Hands.Direct("capri, open your website", out shortTool, out shortArgs) || shortTool != "open_website" || shortArgs.Site != Hands.Home || !Hands.Direct("google weather tomorrow", out shortTool, out shortArgs) || shortTool != "open_website" || shortArgs.Site != "google" || shortArgs.Search != "weather tomorrow" || Hands.Direct("look up it", out shortTool, out shortArgs)) throw new Exception("Her website or a quick Google search didn't skip the brain.");
