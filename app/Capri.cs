@@ -3593,7 +3593,7 @@ namespace CapriDesktop
                             checks.Add("PASS size menu");
                             string[] tops = new string[menu.Items.Count];
                             for (int i = 0; i < tops.Length; i++) tops[i] = menu.Items[i].Text;
-                            if (string.Join(",", tops) != "CAPRI  /  " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3) + ",,Open Capri Mainframe,Hide Capri,Size,Move,Help,,Quit Capri") throw new Exception("The right-click menu is not the short one: " + string.Join(",", tops));
+                            if (string.Join(",", tops) != "CAPRI  /  " + Assembly.GetExecutingAssembly().GetName().Version.ToString(3) + ",,Open Capri Mainframe,Hide Capri,Size,Move,Start with Windows,Help,,Quit Capri") throw new Exception("The right-click menu is not the short one: " + string.Join(",", tops));
                             ToggleMotion();
                             if (frames.Enabled) throw new Exception("Motion toggle did not stop idle timer.");
                             checks.Add("PASS motion pause");
