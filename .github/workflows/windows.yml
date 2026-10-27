@@ -22,6 +22,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           dotnet build build/Capri.Setup.csproj -c Release -o build/setup-out
           if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Screen like a real PC
+        shell: pwsh
+        run: |
+          try { Set-DisplayResolution -Width 1920 -Height 1080 -Force } catch { Write-Host "::warning::Could not set the resolution: $_" }
+          Add-Type -AssemblyName System.Windows.Forms
+          Write-Host "::notice title=Screen::$([System.Windows.Forms.Screen]::PrimaryScreen.Bounds)"
       - name: Smoke test
         shell: pwsh
         timeout-minutes: 15
