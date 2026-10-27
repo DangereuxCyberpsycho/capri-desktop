@@ -197,6 +197,7 @@ namespace CapriSetup
                 DeleteShortcut(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Capri.lnk"), destination);
                 DeleteShortcut(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Capri.lnk"), destination);
                 Registry.CurrentUser.DeleteSubKeyTree(RegistryPath, false);
+                using (RegistryKey run = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true)) if (run != null) run.DeleteValue("Capri", false);
                 MessageBox.Show("Capri has been removed.\n\nYour position and size settings were kept in " + destination + ".", "Capri", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return 0;
             }

@@ -367,12 +367,13 @@ namespace CapriDesktop
             return cultures.Count > 0 ? cultures[0] : null;
         }
 
+        internal static string Wanted() { return CultureInfo.CurrentUICulture.Name.StartsWith(Brain.Language, StringComparison.OrdinalIgnoreCase) ? CultureInfo.CurrentUICulture.Name : Brain.Language + "-FR"; }
+
         private static SpeechRecognitionEngine Open()
         {
             List<RecognizerInfo> installed = new List<RecognizerInfo>(SpeechRecognitionEngine.InstalledRecognizers());
             List<string> cultures = installed.ConvertAll(delegate(RecognizerInfo info) { return info.Culture.Name; });
-            string wanted = CultureInfo.CurrentUICulture.Name.StartsWith(Brain.Language, StringComparison.OrdinalIgnoreCase) ? CultureInfo.CurrentUICulture.Name : Brain.Language + "-FR";
-            string chosen = Pick(cultures, wanted);
+            string chosen = Pick(cultures, Wanted());
             if (chosen == null) throw new IOException(NoRecognizer);
             SpeechRecognitionEngine made = new SpeechRecognitionEngine(installed[cultures.IndexOf(chosen)]);
             made.LoadGrammar(new DictationGrammar());

@@ -256,6 +256,15 @@ namespace CapriDesktop
         internal const string Unpromised = "Je ne l'ai pas encore fait, choom. Dis-moi quoi ouvrir ou sur quoi cliquer et je m'en occupe.";
         private static readonly Regex Promise = new Regex(@"\b(i'?ll|i will|let me|lemme|i'?m (gonna|going to|about to)|gonna|on it,?)\s+(\w+\s+){0,2}(open|launch|load|boot|fire|pull|bring|search|google|look up|click|type|close|switch|head|install|download|play(?!\s+(along|around|with|nice|fair|dumb|it (cool|safe)|((a|some|the|this|that|any|your|my)\s+)?(games?|round|match)\b|devil))|put on|queue|blast|spin)\b|^((sure|ok|okay|alright|bet|got it|on it|say less|yessir+|yezzir+)[,.!\s]+)?(opening|launching|loading|pulling up|bringing up|firing up|booting up|heading to|searching|clicking|typing|closing|switching|playing|putting on|queuing|queueing|blasting|spinning)\b|\b(je vais|j'vais|laisse-moi|je m'en occupe,?)\s+(\w+\s+){0,2}(l'|t'|les |la |le )?(ouvrir|lancer|charger|chercher|googler|cliquer|taper|fermer|mettre|passer|t[ée]l[ée]charger|installer|jouer(?!\s+(avec|[àa]|aux|un|une|le jeu|au)\b))\b|^((ok|okay|d'accord|[çc]a marche|carr[ée]ment|yessir+|yezzir+)[,.!\s]+)?(j'ouvre|je lance|je mets|je cherche|je ferme|je clique|je tape|je passe|c'est parti pour)\b", RegexOptions.IgnoreCase);
 
+        private static readonly Regex Calling = new Regex(@"^\W*(h[ée]+|hey|eh|et|ok|okay|salut|yo)\W+capr[iy]s?\b[\s,.!?:;\-]*(.*?)[\s.!?]*$", RegexOptions.IgnoreCase);
+
+        // What was asked after "Hé Capri": null when she wasn't called, "" when they only called her.
+        internal static string Called(string heard)
+        {
+            Match found = Calling.Match((heard ?? "").Trim());
+            return found.Success ? found.Groups[2].Value.Trim() : null;
+        }
+
         internal static bool Promised(string said) { return Promise.IsMatch((said ?? "").Replace('’', '\'')); }
 
         internal static bool Follows(string said, string asked, string answered)
