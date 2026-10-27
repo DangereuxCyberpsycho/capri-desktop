@@ -7,7 +7,7 @@ namespace CapriDesktop
     internal static class VoicePack
     {
         internal const string Name = "capri-voice-1";
-        internal const string Url = "https://github.com/locharvet1112-droid/capri-desktop/releases/download/voice-pack-1/capri-voice-1.zip";
+        internal const string Url = "https://github.com/DangereuxCyberpsycho/capri-desktop/releases/download/voice-pack-1/capri-voice-1.zip";
         internal const string Sha = "9fae085696d68a580d6b1a953d7b253129bfe506a2c016421b306b7237d3214c";
         internal const long Size = 316041808;
         internal static readonly string[] Needed = { "sherpa-onnx-c-api.dll", "onnxruntime.dll", "model.onnx", "voices.bin", "tokens.txt", "lexicon-us-en.txt", "lexicon-gb-en.txt", Path.Combine("espeak-ng-data", "phontab") };
