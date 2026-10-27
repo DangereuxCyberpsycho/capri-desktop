@@ -28,11 +28,20 @@ jobs:
         run: |
           $smoke = Join-Path $PWD "smoke"
           $run = Start-Process -FilePath build/out/Capri.exe -ArgumentList "--smoke-test", "`"$smoke`"" -PassThru -Wait
-          if (Test-Path "$smoke/smoke-test.txt") { Get-Content "$smoke/smoke-test.txt" }
-          if (Test-Path "$smoke/failure.txt") { Get-Content "$smoke/failure.txt"; exit 1 }
-          if ($run.ExitCode -ne 0) { Write-Host "Capri exited with $($run.ExitCode)"; exit 1 }
-          if (-not (Test-Path "$smoke/smoke-test.txt")) { Write-Host "No smoke test results"; exit 1 }
-          if (Select-String -Path "$smoke/smoke-test.txt" -Pattern '^FAIL' -Quiet) { exit 1 }
+          $failed = $run.ExitCode -ne 0
+          if (Test-Path "$smoke/smoke-test.txt") {
+            $lines = Get-Content "$smoke/smoke-test.txt"
+            $lines
+            $passes = @($lines | Where-Object { $_ -like 'PASS*' }).Count
+            Write-Host "::notice title=Smoke test::$passes PASS"
+            foreach ($line in $lines | Where-Object { $_ -like 'FAIL*' }) { Write-Host "::error title=Smoke test::$line"; $failed = $true }
+          } else { Write-Host "::error title=Smoke test::No smoke-test.txt"; $failed = $true }
+          if (Test-Path "$smoke/failure.txt") {
+            $crash = (Get-Content "$smoke/failure.txt" -Raw) -replace '%', '%25' -replace "`r", '' -replace "`n", '%0A'
+            Write-Host "::error title=Smoke test crash::$crash"
+            $failed = $true
+          }
+          if ($failed) { Write-Host "::error title=Smoke test::Capri exited with $($run.ExitCode)"; exit 1 }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
