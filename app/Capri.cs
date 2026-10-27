@@ -2728,8 +2728,8 @@ namespace CapriDesktop
                 string problem = null;
                 bool stuck = false;
                 try { said = Safety.Filter(think(text)); }
-                catch (BrainException error) { said = error.Message == Brain.Offline ? Brain.Offline : error.Told ? error.Message : "My brain couldn't answer. The error is under BRAIN in Capri Mainframe."; problem = error.Message; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
-                catch (Exception error) { said = Brain.Explain(error, remote) ?? "That reply was cancelled. Try again."; problem = said; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
+                catch (BrainException error) { said = error.Message == Brain.Offline ? Brain.Offline : error.Told ? error.Message : "Mon cerveau n'a pas pu r\u00e9pondre. L'erreur est sous BRAIN dans Capri Mainframe."; problem = error.Message; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
+                catch (Exception error) { said = Brain.Explain(error, remote) ?? "Cette r\u00e9ponse a \u00e9t\u00e9 annul\u00e9e. R\u00e9essaie."; problem = said; state = TalkState.Dormant; stuck = Brain.Stalled(error); }
                 if (string.IsNullOrWhiteSpace(said)) { said = "My brain sent an empty reply. Try again."; problem = said; state = TalkState.Dormant; }
                 try
                 {
@@ -4591,7 +4591,7 @@ namespace CapriDesktop
                                         catch (WebException error) { failure = error; }
                                         WebExceptionStatus wanted = fault == 3 ? WebExceptionStatus.RequestCanceled : WebExceptionStatus.Timeout;
                                         if (failure == null || failure.Status != wanted || waited.ElapsedMilliseconds > 3000) throw new Exception("Cloud wait " + fault + " did not end as " + wanted + ".");
-                                        if (fault == 3 ? Brain.Explain(failure, slow.Remote) != null : Brain.Explain(failure, slow.Remote).IndexOf("NVIDIA didn't answer", StringComparison.Ordinal) < 0) throw new Exception("Timeout and cancellation were confused.");
+                                        if (fault == 3 ? Brain.Explain(failure, slow.Remote) != null : Brain.Explain(failure, slow.Remote).IndexOf("NVIDIA n'a pas r\u00e9pondu", StringComparison.Ordinal) < 0) throw new Exception("Timeout and cancellation were confused.");
                                     }
                                     finally { slow.Cancel(); slowFake.Stop(); Brain.Nvidia = realNvidia; }
                                 }
@@ -5927,7 +5927,7 @@ namespace CapriDesktop
                         }
                         else if (step == 20)
                         {
-                            if (talkState != TalkState.Dormant || reply != "That reply was cancelled. Try again." || errorVoice != 0) throw new Exception("A current cancelled reply stayed in THINKING.");
+                            if (talkState != TalkState.Dormant || reply != "Cette r\u00e9ponse a \u00e9t\u00e9 annul\u00e9e. R\u00e9essaie." || errorVoice != 0) throw new Exception("A current cancelled reply stayed in THINKING.");
                             checks.Add("PASS cloud failures: explained errors, timeouts and current cancellations leave THINKING and show text without calling voice");
                             ManualResetEvent lastVoice = new ManualResetEvent(false);
                             Speak = delegate { if (!lastVoice.WaitOne(3000)) throw new Exception("Late voice gate stayed shut."); return tone; };
