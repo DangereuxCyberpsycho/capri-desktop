@@ -60,3 +60,36 @@ jobs:
           path: |
             build/out/Capri.exe
             build/setup-out/Capri-Setup.exe
+
+  release:
+    # Publie une version quand main reçoit un numéro de version qui n'a pas encore de release.
+    # Capri installée cherche ses mises à jour ici toutes les 3 heures (Updater.Repository).
+    needs: windows
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Version
+        id: version
+        run: |
+          full=$(sed -n 's/.*AssemblyVersion("\([0-9.]*\)").*/\1/p' app/AssemblyInfo.cs)
+          version=${full%.0}
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          if gh release view "v$version" >/dev/null 2>&1; then echo "new=false" >> "$GITHUB_OUTPUT"; else echo "new=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/download-artifact@v5
+        if: steps.version.outputs.new == 'true'
+        with:
+          name: Capri-windows
+          path: dist
+      - name: Publish
+        if: steps.version.outputs.new == 'true'
+        run: |
+          mkdir release
+          cp dist/setup-out/Capri-Setup.exe dist/out/Capri.exe release/
+          (cd release && sha256sum Capri-Setup.exe Capri.exe > SHA256SUMS.txt)
+          gh release create "${{ steps.version.outputs.tag }}" release/* --target "$GITHUB_SHA" --title "Capri ${{ steps.version.outputs.tag }}" --generate-notes
